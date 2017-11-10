@@ -24,8 +24,8 @@ R rando(){
 
 struct Scene{
 	std::vector<Shape*> shapes;//物体
-	const int HEIGHT = 200;//縦のピクセル
-	const int WIDTH = 200;//横のピクセル
+	const int HEIGHT = 480;//縦のピクセル
+	const int WIDTH = 480;//横のピクセル
 	const R INF = 1000000000.0;
 	const FColor back;//物体がないときの色
 	const int MAX_DEPTH = 3;//再帰の深さの最大値
