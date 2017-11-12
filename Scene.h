@@ -28,17 +28,18 @@ struct Scene{
 	const int WIDTH = 480;//横のピクセル
 	const R INF = 1000000000.0;
 	const FColor back;//物体がないときの色
-	const int MAX_DEPTH = 3;//再帰の深さの最大値
+	const int MAX_DEPTH = 4;//再帰の深さの最大値
 	FColor *img;//ピクセルごとの色を保持
 
-	inline Scene(): back(FColor(100.0 / 255,149.0 / 255,237.0 / 255)),img(new FColor[HEIGHT * WIDTH]){};
+	inline Scene(): back(FColor(100.0 / 255,149.0 / 255,237.0 / 255)),img(new FColor[HEIGHT * WIDTH]){}
+	inline Scene(int w,int h) :WIDTH(w),HEIGHT(h),back(FColor(100.0 / 255,149.0 / 255,237.0 / 255)),img(new FColor[HEIGHT * WIDTH]){};
 
 	inline void add(Shape *shape){//物体を追加する
 		shapes.push_back(shape);
 	}
 
 	inline void init_img(){
-		#pragma omp parallel for schedule(dynamic, 1) num_threads(4)
+		#pragma omp parallel for schedule(dynamic, 1) num_threads(8)
 		for(int i = 0;i < HEIGHT * WIDTH;i++)
 			img[i] = FColor(0,0,0);
 	}
@@ -170,7 +171,7 @@ struct Scene{
 		if(N == 0)
 			init_img();
 		Camera camera(WIDTH,HEIGHT);
-		#pragma omp parallel for schedule(dynamic, 1) num_threads(4)
+		#pragma omp parallel for schedule(dynamic, 1) num_threads(8)
 		for(int i = 0;i < HEIGHT;i++){
 			for(int j = 0;j < WIDTH;j++){
 				//const Ray ray(Vec3(0,0,-5),Vec3(2.0 * j / (WIDTH - 1) - 1,-2.0 * i / (HEIGHT - 1) + 1,5.0));
@@ -184,11 +185,33 @@ struct Scene{
 		}
 	}
 
-	void draw() {
+	void compute(int n,int N,int supersamples){//サンプル回数とすでに何回サンプリングしているか
+		if(N == 0)
+			init_img();
+		Camera camera(WIDTH,HEIGHT);
+		const R r = 1.0 / (n * supersamples * supersamples + N);
+		#pragma omp parallel for schedule(dynamic, 1) num_threads(8)
+		for(int i = 0;i < HEIGHT;i++){
+			for(int j = 0;j < WIDTH;j++){
+				img[i * WIDTH + j] *= N;
+				for(int sy = 0;sy < supersamples;sy++){
+					for(int sx = 0;sx < supersamples;sx++){
+						const Ray ray = camera.get_ray(sy,sx,supersamples,i,j);
+						for(int k = 0;k < n;k++){
+							img[i * WIDTH + j] += pathtracing(ray,0);
+						}
+					}
+				}
+				img[i * WIDTH + j] *= r;
+			}
+		}
+	}
+
+	void draw(int sample,int supersamples) {
 
 		printf("P3\n%d %d\n255\n", WIDTH,HEIGHT);
 
-		compute(8192,0);
+		compute(sample,0,supersamples);
 
 		for(int i = 0;i < HEIGHT * WIDTH;i++)
 			img[i].print255();

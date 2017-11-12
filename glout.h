@@ -8,8 +8,9 @@ Scene *glScene;
 void idle(){
 	static int N = 0;
     int n = 20;
-    glScene->compute(n,N);
-    N += n;
+    int super = 3;
+    glScene->compute(n,N,super);
+    N += (n * super * super);
 	printf("%d\n",N);
 	glutPostRedisplay();
 }

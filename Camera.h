@@ -26,4 +26,12 @@ struct Camera{
     Ray get_ray(int i,int j){
         return Ray(position,center + ((R)j / picW - 0.5) * x + ((R)i / picH - 0.5) * y);
     }
+
+    Ray get_ray(int sy,int sx,int supersamples,int i,int j){
+        const R d = 1.0 / supersamples;
+        const R dx = sx * d + d * 0.5;
+        const R dy = sy * d + d * 0.5;
+
+        return Ray(position,center + ((R)(j + dx) / picW - 0.5) * x + ((R)(i + dy) / picH - 0.5) * y);
+    }
 };
