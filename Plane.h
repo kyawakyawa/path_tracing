@@ -22,9 +22,9 @@ struct Plane: public Shape{
 		Vec3 s2;
 
 		////平面上のもう一つの天を取得
-		if(std::abs(normal.x) > 1e-9)
+		if(std::abs(normal.x) > EPS)
 			s2 = Vec3(-(normal.y + normal.z) / normal.x,1,1);
-		else if(std::abs(normal.y) > 1e-9)
+		else if(std::abs(normal.y) > EPS)
 			s2 = Vec3(1,-(normal.x + normal.z) / normal.y,1);
 		else
 			s2 = Vec3(1,1,-(normal.x + normal.y) / normal.z);
@@ -44,14 +44,14 @@ struct Plane: public Shape{
 
 	inline Material get_material(const Vec3 &position) const {
 		if(type == PL_CHECKERBOARD_CHECK){
-			const Vec3 d = (this->position - position) / edge;
+			const Vec3 d = (this->position - position) / edge / 25.0;
 			const int x = (d.x < 0.0) ? d.x - 1.0:d.x;
 			const int z = (d.z < 0.0) ? d.z - 1.0:d.z;
 			bool even_x,even_z;
 			even_x = (x % 2 == 0);
 			even_z = (z % 2  == 0);
 
-			return (even_x == even_z) ? Material(FColor(0.69,0.69,0.69)) : Material(FColor(0.0,0.0,0.0));
+			return (even_x == even_z) ? Material(FColor(0.75,0.75,0.75)) : Material(FColor(0.05,0.05,0.05));
 		}
 		return material;
 	}

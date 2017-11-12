@@ -20,9 +20,9 @@ struct FColor{
         R r = red;
         R g = green;
         R b = blue;
-        r = std::max(0.0,r);r = std::min(1.0,r);
-        g = std::max(0.0,g);g = std::min(1.0,g);
-        b = std::max(0.0,b);b = std::min(1.0,b);
+        r = std::max((R)0.0,r);r = std::min((R)1.0,r);
+        g = std::max((R)0.0,g);g = std::min((R)1.0,g);
+        b = std::max((R)0.0,b);b = std::min((R)1.0,b);
         int ir = std::pow(r,1.0 / 2.2) * 255 + 0.5;
         int ig = std::pow(g,1.0 / 2.2) * 255 + 0.5;
         int ib = std::pow(b,1.0 / 2.2) * 255 + 0.5;
