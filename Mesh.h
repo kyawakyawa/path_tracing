@@ -15,9 +15,9 @@ struct Mesh : public Shape{
 
 	Mesh() = delete;
 	inline Mesh(const tinyobj::attrib_t &at,const std::vector< tinyobj::shape_t > &shs,const Material &m): Shape(m){
-		for(auto sh : shs){
+		for(const auto &sh : shs){
 			int p = 0;
-			for(auto nfv : sh.mesh.num_face_vertices){
+			for(const auto &nfv : sh.mesh.num_face_vertices){
 				Polygon poly;
 				for(int i = 0;i < nfv;i++){
 					poly.push_back(get_vertice(at,sh.mesh.indices[p].vertex_index));
@@ -26,8 +26,8 @@ struct Mesh : public Shape{
 				polygons.push_back(poly);
 			}
 		}
-		for(auto polygon : polygons){
-			for(auto v : polygon){
+		for(const auto &polygon : polygons){
+			for(const auto &v : polygon){
 				std::cout << v << " ";
 			}
 			std::cout << std::endl;
@@ -38,8 +38,7 @@ struct Mesh : public Shape{
 		return Vec3(at.vertices[index * 3],at.vertices[index * 3 + 1],at.vertices[index * 3 + 2]) * 10 + Vec3(50,10,70);
 	}
 
-	inline Intersection_point* polygon_intersection(const Ray &ray,const int index) const{
-		Polygon polygon = polygons[index];
+	static inline Intersection_point* polygon_intersection(const Ray &ray,const Polygon &polygon) {
 		const Vec3 normal = (cross(polygon[1] - polygon[0],polygon[2] - polygon[1])).normalized();
 
 		const Vec3 &d = ray.direction;
@@ -78,8 +77,8 @@ struct Mesh : public Shape{
 		Intersection_point *ret = nullptr;
 		R mint = 1000000000.0;
 
-		for(int i = 0;i < polygons.size();i++){
-			Intersection_point *p = polygon_intersection(ray,i);
+		for(const auto &polygon : polygons){
+			Intersection_point *p = polygon_intersection(ray,polygon);
 			if(p != nullptr && p->distance < mint){
 				mint = p->distance;
 				delete ret;
