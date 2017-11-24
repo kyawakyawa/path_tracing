@@ -3,6 +3,7 @@
 #include<iostream>
 #include<cmath>
 #define EPS 1e-6
+#define EQ(a,b) (std::abs((a)-(b)) < EPS)//２つの実数が等しいか
 
 typedef double R;
 
@@ -67,6 +68,10 @@ struct Vec3{
 			return *this;
 		}
 
+		inline bool operator ==(const Vec3 &obj){
+			return EQ(this->x,obj.x) && EQ(this->y,obj.y) && EQ(this->z,obj.z);
+		}
+
 	 	inline R abs() const{//gccならconstexprにしても良い
 			return std::sqrt(x * x + y * y + z * z);
 		}
@@ -89,7 +94,7 @@ inline constexpr Vec3 cross(const Vec3 &v1,const Vec3 &v2){
 		(v1.z * v2.x) - (v1.x * v2.z),
 		(v1.x * v2.y) - (v1.y * v2.x));
 }
-
+	
 template <class Char> // 出力ストリーム
 inline std::basic_ostream<Char>& operator <<(std::basic_ostream<Char>& os, const Vec3& v){
     return os << Char('(') << v.x << Char(',') <<v.y << Char(',') << v.z << Char(')');
