@@ -6,12 +6,14 @@
 
 #include "Vec3.h"
 #include "Shape.h"
+#include "BVH.h"
 
 typedef std::vector< Vec3 > Polygon;
 
 struct Mesh : public Shape{
 
 	std::vector< Polygon > polygons;
+	BVH bvh;
 
 	Mesh() = delete;
 	inline Mesh(const tinyobj::attrib_t &at,const std::vector< tinyobj::shape_t > &shs,const Material &m): Shape(m){
@@ -26,16 +28,19 @@ struct Mesh : public Shape{
 				polygons.push_back(poly);
 			}
 		}
-		for(const auto &polygon : polygons){
+
+		bvh.constraction(polygons);
+		/*for(const auto &polygon : polygons){
 			for(const auto &v : polygon){
 				std::cout << v << " ";
 			}
 			std::cout << std::endl;
-		}
+		}*/
 	};
 
 	inline Vec3 get_vertice(const tinyobj::attrib_t &at,int index){
-		return Vec3(at.vertices[index * 3],at.vertices[index * 3 + 1],at.vertices[index * 3 + 2]) * 10 + Vec3(50,10,70);
+		return Vec3(at.vertices[index * 3],at.vertices[index * 3 + 1],at.vertices[index * 3 + 2]) * 30 + Vec3(50,10,70);//bunny
+		//return Vec3(at.vertices[index * 3],at.vertices[index * 3 + 1],at.vertices[index * 3 + 2]) * (R)(0.2) + Vec3(50,10,50);//car
 	}
 
 	static inline Intersection_point* polygon_intersection(const Ray &ray,const Polygon &polygon) {
@@ -73,8 +78,8 @@ struct Mesh : public Shape{
 		return new Intersection_point(t,ray.start + t * d,normal);
 	}
 	
-	inline Intersection_point* get_intersection(const Ray &ray) const{
-		Intersection_point *ret = nullptr;
+	inline Intersection_point* get_intersection(const Ray &ray) const {
+		/*Intersection_point *ret = nullptr;
 		R mint = 1000000000.0;
 
 		for(const auto &polygon : polygons){
@@ -86,7 +91,9 @@ struct Mesh : public Shape{
 			}
 		}
 
-		return ret;
+		return ret;*/
+
+		return bvh.traverse(ray,polygons);
 	}
 
 	inline Material get_material(const Vec3 &position) const {
