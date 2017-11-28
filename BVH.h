@@ -11,13 +11,63 @@
 
 typedef std::vector< Vec3 > Polygon;
 
+
+struct CompX{//インライン展開できるよう関数オブジェクトを使う
+	bool operator()(Polygon &a,Polygon &b){
+		R max_x_a = -1000000000.0;
+		R max_x_b = -1000000000.0;
+
+		for(auto v : a){
+			max_x_a = std::max(max_x_a,v.x);
+		}
+		for(auto v : b){
+			max_x_b = std::max(max_x_b,v.x);
+		}
+
+		return max_x_a < max_x_b;
+	}
+} compX;
+
+struct CompY{
+	bool operator()(Polygon &a,Polygon &b){
+		R max_y_a = -1000000000.0;
+		R max_y_b = -1000000000.0;
+
+		for(auto v : a){
+			max_y_a = std::max(max_y_a,v.y);
+		}
+		for(auto v : b){
+			max_y_b = std::max(max_y_b,v.y);
+		}
+
+		return max_y_a < max_y_b;
+	}
+
+} compY;
+
+struct CompZ{
+	bool operator()(Polygon &a,Polygon &b){
+		R max_z_a = -1000000000.0;
+		R max_z_b = -1000000000.0;
+
+		for(auto v : a){
+			max_z_a = std::max(max_z_a,v.z);
+		}
+		for(auto v : b){
+			max_z_b = std::max(max_z_b,v.z);
+		}
+
+		return max_z_a < max_z_b;
+	}
+} compZ;
+
 struct BVH {
 
 	std::vector< Node_BVH > nodes;
 	int root = 0;
 
 	BVH() = default;
-	BVH(std::vector< Polygon > &polygons){
+	BVH(std::vector< Polygon > &polygons) : nodes(polygons.size() * 2){
 		root = constraction(polygons,polygons.begin(),polygons.end(),0);
 	};
 
@@ -26,7 +76,7 @@ struct BVH {
 	}
 
 	int constraction(std::vector< Polygon > &polygons,std::vector< Polygon >::iterator left,std::vector< Polygon >::iterator right,int depth){
-		depth %= 3;
+		//depth %= 3;
 		int n = std::distance(left,right);
 
 		Node_BVH node;
@@ -49,9 +99,18 @@ struct BVH {
 			return nodes.size() - 1;
 		}
 
-		if(depth == 0)
+		R max_w = node.aabb_max[0] - node.aabb_min[0];
+		int max_i = 0;
+		for(int i = 1;i < 3;i++){
+			if(max_w < node.aabb_max[i] - node.aabb_min[i]){
+				max_w = node.aabb_max[i] - node.aabb_min[i];
+				max_i = i;
+			}
+		}
+
+		if(max_i == 0)
 			std::sort(left,right,compX);
-		else if(depth == 1)
+		else if(max_i == 1)
 			std::sort(left,right,compY);
 		else
 			std::sort(left,right,compZ);
@@ -66,7 +125,7 @@ struct BVH {
 		return nodes.size() - 1;
 	}
 
-	static bool compX(Polygon &a,Polygon &b){
+	/*static bool compX(Polygon &a,Polygon &b){
 		R max_x_a = -1000000000.0;
 		R max_x_b = -1000000000.0;
 
@@ -104,7 +163,7 @@ struct BVH {
 		}
 
 		return max_z_a < max_z_b;
-	}
+	}*/
 
 	Intersection_point* traverse(const Ray &ray,const std::vector< Polygon > &polygons) const{
 		return traverse(ray,polygons,root);

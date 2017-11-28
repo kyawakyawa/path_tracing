@@ -39,7 +39,8 @@ int main(int argc, char **argv){
 
 	//std::cout << attrib.vertices.size() << std::endl;
 
-	scene.add(new Mesh(attrib,shapes,Material(FColor(a + 0.10,a - 0.30,a - 0.30))));
+	scene.add(new Mesh(attrib,shapes,Material(FColor(a + 0.10,a - 0.30,a - 0.30))));//うすピンク
+	//scene.add(new Mesh(attrib,shapes,Material(FColor(a ,a ,a))));//白
 	//scene.add(new Mesh(attrib,shapes,Material(FColor(240.0 / 255,210.0 / 255,37.0 / 255),MT_PERFECT_REF)));
 	//scene.add(new Mesh(attrib,shapes,Material(MT_REFRACTION)));
 	
@@ -53,9 +54,9 @@ int main(int argc, char **argv){
 	//scene.add(new Sphere(Vec3(65,20,20),20,Material(FColor(b,b,a))));
 	//scene.add(new Sphere(Vec3(27,16.5,47),16.5,Material(FColor(240.0 / 255,210.0 / 255,37.0 / 255),MT_PERFECT_REF)));
 	//scene.add(new Sphere(Vec3(77,16.5,78),16.5,Material(MT_REFRACTION)));
-	scene.add(new Sphere(Vec3(50.0,120.0,81.6),15,Material(FColor(0.30,0.30,0.30),FColor(32,32,32))));
+	scene.add(new Sphere(Vec3(81.6,120.0,50.0),15,Material(FColor(0.30,0.30,0.30),FColor(16,16,16))));
 
 	drawgl(argc,argv,scene);
-	//scene.draw(512,2);
+	//scene.draw(32,2);
 	return 0;
 }

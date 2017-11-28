@@ -39,8 +39,11 @@ struct Mesh : public Shape{
 	};
 
 	inline Vec3 get_vertice(const tinyobj::attrib_t &at,int index){
-		return Vec3(at.vertices[index * 3],at.vertices[index * 3 + 1],at.vertices[index * 3 + 2]) * 30 + Vec3(50,10,70);//bunny
+		//return Vec3(at.vertices[index * 3],at.vertices[index * 3 + 1],at.vertices[index * 3 + 2]) * 30 + Vec3(50,10,70);//bunny
+		//return Vec3(at.vertices[index * 3],at.vertices[index * 3 + 1],at.vertices[index * 3 + 2]) * 70 + Vec3(70,20,50);//dragon
 		//return Vec3(at.vertices[index * 3],at.vertices[index * 3 + 1],at.vertices[index * 3 + 2]) * (R)(0.2) + Vec3(50,10,50);//car
+		//return Vec3(at.vertices[index * 3],at.vertices[index * 3 + 1],at.vertices[index * 3 + 2]) + Vec3(50,60,70);//sibenik
+		return Vec3(at.vertices[index * 3],at.vertices[index * 3 + 1],at.vertices[index * 3 + 2]) * 70 + Vec3(50,20,60);//buddha
 	}
 
 	static inline Intersection_point* polygon_intersection(const Ray &ray,const Polygon &polygon) {
