@@ -7,8 +7,9 @@
 #include "Vec3.h"
 #include "Shape.h"
 #include "BVH.h"
+#include "Polygon.h"
 
-typedef std::vector< Vec3 > Polygon;
+//typedef std::vector< Vec3 > Polygon;
 
 struct Mesh : public Shape{
 
@@ -22,7 +23,7 @@ struct Mesh : public Shape{
 			for(const auto &nfv : sh.mesh.num_face_vertices){
 				Polygon poly;
 				for(int i = 0;i < nfv;i++){
-					poly.push_back(get_vertice(at,sh.mesh.indices[p].vertex_index));
+					poly.vertex.push_back(get_vertice(at,sh.mesh.indices[p].vertex_index));
 					p++;
 				}
 				polygons.push_back(poly);
@@ -43,11 +44,11 @@ struct Mesh : public Shape{
 		//return Vec3(at.vertices[index * 3],at.vertices[index * 3 + 1],at.vertices[index * 3 + 2]) * 70 + Vec3(70,20,50);//dragon
 		//return Vec3(at.vertices[index * 3],at.vertices[index * 3 + 1],at.vertices[index * 3 + 2]) * (R)(0.2) + Vec3(50,10,50);//car
 		//return Vec3(at.vertices[index * 3],at.vertices[index * 3 + 1],at.vertices[index * 3 + 2]) + Vec3(50,60,70);//sibenik
-		return Vec3(at.vertices[index * 3],at.vertices[index * 3 + 1],at.vertices[index * 3 + 2]) * 70 + Vec3(50,20,60);//buddha
+		return Vec3(at.vertices[index * 3],at.vertices[index * 3 + 1],at.vertices[index * 3 + 2]) * 70 + Vec3(50,30,60);//buddha
 	}
 
 	static inline Intersection_point* polygon_intersection(const Ray &ray,const Polygon &polygon) {
-		const Vec3 normal = (cross(polygon[1] - polygon[0],polygon[2] - polygon[1])).normalized();
+		const Vec3 normal = (cross(polygon.vertex[1] - polygon.vertex[0],polygon.vertex[2] - polygon.vertex[1])).normalized();
 
 		const Vec3 &d = ray.direction;
 		Vec3 s2;
@@ -60,7 +61,7 @@ struct Mesh : public Shape{
 		else
 			s2 = Vec3(1,1,-(normal.x + normal.y) / normal.z);
 
-		const Vec3 s = ray.start - (s2 + polygon[0]);
+		const Vec3 s = ray.start - (s2 + polygon.vertex[0]);
 
 		if(std::abs(d * normal) < EPS)//レイと平面が並行
 			return nullptr;
@@ -72,9 +73,9 @@ struct Mesh : public Shape{
 
 		Vec3 intersection = ray.start + t * d;
 
-		int m = polygon.size();
+		int m = polygon.vertex.size();
 		for(int i = 0;i < m;i++){
-			if(!((cross(polygon[(i + 1) % m] - polygon[i],intersection - polygon[(i + 1) % m])).normalized() == normal)){
+			if(!((cross(polygon.vertex[(i + 1) % m] - polygon.vertex[i],intersection - polygon.vertex[(i + 1) % m])).normalized() == normal)){
 				return nullptr;
 			}
 		}

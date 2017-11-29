@@ -8,56 +8,26 @@
 #include "Vec3.h"
 #include "Intersection_point.h"
 #include "Node_BVH.h"
+#include "Polygon.h"
 
-typedef std::vector< Vec3 > Polygon;
+//typedef std::vector< Vec3 > Polygon;
 
 
 struct CompX{//インライン展開できるよう関数オブジェクトを使う
-	bool operator()(Polygon &a,Polygon &b){
-		R max_x_a = -1000000000.0;
-		R max_x_b = -1000000000.0;
-
-		for(auto v : a){
-			max_x_a = std::max(max_x_a,v.x);
-		}
-		for(auto v : b){
-			max_x_b = std::max(max_x_b,v.x);
-		}
-
-		return max_x_a < max_x_b;
+	bool operator()(const Polygon &a,const Polygon &b){
+		return a.aabb_max[0] < b.aabb_min[0];
 	}
 } compX;
 
 struct CompY{
-	bool operator()(Polygon &a,Polygon &b){
-		R max_y_a = -1000000000.0;
-		R max_y_b = -1000000000.0;
-
-		for(auto v : a){
-			max_y_a = std::max(max_y_a,v.y);
-		}
-		for(auto v : b){
-			max_y_b = std::max(max_y_b,v.y);
-		}
-
-		return max_y_a < max_y_b;
+	bool operator()(const Polygon &a,const Polygon &b){
+		return a.aabb_max[1] < b.aabb_min[1];
 	}
-
 } compY;
 
 struct CompZ{
-	bool operator()(Polygon &a,Polygon &b){
-		R max_z_a = -1000000000.0;
-		R max_z_b = -1000000000.0;
-
-		for(auto v : a){
-			max_z_a = std::max(max_z_a,v.z);
-		}
-		for(auto v : b){
-			max_z_b = std::max(max_z_b,v.z);
-		}
-
-		return max_z_a < max_z_b;
+	bool operator()(const Polygon &a,const Polygon &b){
+		return a.aabb_max[2] < b.aabb_min[2];
 	}
 } compZ;
 
@@ -68,11 +38,26 @@ struct BVH {
 
 	BVH() = default;
 	BVH(std::vector< Polygon > &polygons) : nodes(polygons.size() * 2){
-		root = constraction(polygons,polygons.begin(),polygons.end(),0);
+		constraction(polygons);
 	};
 
 	void constraction(std::vector< Polygon > &polygons){
+		make_polygons_aabbs(polygons);
 		root = constraction(polygons,polygons.begin(),polygons.end(),0);
+	}
+
+	void make_polygons_aabbs(std::vector< Polygon > &polygons){
+		for(auto &polygon : polygons){
+			for(auto & v : polygon.vertex){
+				polygon.aabb_max[0] = std::max(polygon.aabb_max[0],v.x);
+				polygon.aabb_max[1] = std::max(polygon.aabb_max[1],v.y);
+				polygon.aabb_max[2] = std::max(polygon.aabb_max[2],v.z);
+
+				polygon.aabb_min[0] = std::min(polygon.aabb_min[0],v.x);
+				polygon.aabb_min[1] = std::min(polygon.aabb_min[1],v.y);
+				polygon.aabb_min[2] = std::min(polygon.aabb_min[2],v.z);
+			}
+		}
 	}
 
 	int constraction(std::vector< Polygon > &polygons,std::vector< Polygon >::iterator left,std::vector< Polygon >::iterator right,int depth){
@@ -82,14 +67,9 @@ struct BVH {
 		Node_BVH node;
 
 		for(auto itr = left;itr != right;itr++){
-			for(const auto &v : *itr){
-				node.aabb_max[0] = std::max(node.aabb_max[0],v.x);
-				node.aabb_max[1] = std::max(node.aabb_max[1],v.y);
-				node.aabb_max[2] = std::max(node.aabb_max[2],v.z);
-
-				node.aabb_min[0] = std::min(node.aabb_min[0],v.x);
-				node.aabb_min[1] = std::min(node.aabb_min[1],v.y);
-				node.aabb_min[2] = std::min(node.aabb_min[2],v.z);
+			for(int i = 0;i < 3;i++){
+				node.aabb_max[i] = std::max(node.aabb_max[i],itr->aabb_max[i]);
+				node.aabb_min[i] = std::min(node.aabb_min[i],itr->aabb_min[i]);
 			}
 		}
 
@@ -211,7 +191,7 @@ struct BVH {
 	}
 
 	static inline Intersection_point* polygon_intersection(const Ray &ray,const Polygon &polygon) {
-		const Vec3 normal = (cross(polygon[1] - polygon[0],polygon[2] - polygon[1])).normalized();
+		const Vec3 normal = (cross(polygon.vertex[1] - polygon.vertex[0],polygon.vertex[2] - polygon.vertex[1])).normalized();
 
 		const Vec3 &d = ray.direction;
 		Vec3 s2;
@@ -224,7 +204,7 @@ struct BVH {
 		else
 			s2 = Vec3(1,1,-(normal.x + normal.y) / normal.z);
 
-		const Vec3 s = ray.start - (s2 + polygon[0]);
+		const Vec3 s = ray.start - (s2 + polygon.vertex[0]);
 
 		if(std::abs(d * normal) < EPS)//レイと平面が並行
 			return nullptr;
@@ -236,9 +216,9 @@ struct BVH {
 
 		Vec3 intersection = ray.start + t * d;
 
-		int m = polygon.size();
+		int m = polygon.vertex.size();
 		for(int i = 0;i < m;i++){
-			if(!((cross(polygon[(i + 1) % m] - polygon[i],intersection - polygon[(i + 1) % m])).normalized() == normal)){
+			if(!((cross(polygon.vertex[(i + 1) % m] - polygon.vertex[i],intersection - polygon.vertex[(i + 1) % m])).normalized() == normal)){
 				return nullptr;
 			}
 		}
