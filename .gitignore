@@ -1,6 +1,5 @@
 .vscode
 a.out
-Makefile
 memo.txt
 tiny_obj_loader.h
 obj
