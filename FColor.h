@@ -2,7 +2,7 @@
 #include<cstdio>
 #include<algorithm>
 
-typedef double R;
+typedef float R;
 
 struct FColor{
     R red;

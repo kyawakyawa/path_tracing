@@ -2,10 +2,10 @@
 
 #include<iostream>
 #include<cmath>
-#define EPS 1e-6
+#define EPS 1e-3
 #define EQ(a,b) (std::abs((a)-(b)) < EPS)//２つの実数が等しいか
 
-typedef double R;
+typedef float R;
 
 
 //https://qiita.com/Reputeless/items/96226cfe1282a014b147#5-%E3%83%A1%E3%83%B3%E3%83%90%E9%96%A2%E6%95%B0%E3%82%92%E4%BD%9C%E3%82%8D%E3%81%86
