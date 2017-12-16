@@ -29,6 +29,8 @@ struct Mesh : public Shape{
 				polygons.push_back(poly);
 			}
 		}
+		for(auto &polygon : polygons)
+			polygon.normal = (cross(polygon.vertex[1] - polygon.vertex[0],polygon.vertex[2] - polygon.vertex[1])).normalized();
 
 		bvh.constraction(polygons);
 		/*for(const auto &polygon : polygons){

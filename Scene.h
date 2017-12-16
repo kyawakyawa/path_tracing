@@ -5,7 +5,7 @@
 #include "Shape.h"
 #include "Intersection_info.h"
 #include "Camera.h"
-#include <GL/glut.h>
+//#include <GL/glut.h>
 
 unsigned long long  xor128(void) {
     // x, y, z, w が乱数のシード

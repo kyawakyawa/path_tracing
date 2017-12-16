@@ -2,7 +2,7 @@
 
 #include<iostream>
 #include<cmath>
-#define EPS 1e-3
+#define EPS (1.0 / 2000.0)
 #define EQ(a,b) (std::abs((a)-(b)) < EPS)//２つの実数が等しいか
 
 typedef float R;
@@ -79,8 +79,8 @@ struct Vec3{
 			return x * x + y * y + z * z;
 		}
 		inline Vec3 normalized() const {//正規化（ベクトルの長さを1にする)ベクトル
-			R l = abs();
-			return { x / l,y / l , z / l};
+			R l = 1.0 / std::sqrt(x * x + y * y + z * z);//逆数であることを明示した方が早い？
+			return { x * l,y * l , z * l};
 		}
 };
 

@@ -3,6 +3,7 @@
 #include<iomanip>
 #include<chrono>
 #include <iostream>
+#include<gperftools/profiler.h>
 
 //https://qiita.com/tyanmahou/items/8497d6e815ebf7ea90c6
 
@@ -45,12 +46,12 @@ int main(int argc, char **argv){
 
 	Mesh mesh(attrib,shapes,Material(FColor(b,b,a)));
 
-	Vec3 MAX = Vec3(mesh.bvh.nodes[mesh.bvh.root].aabb_max[0],
-				mesh.bvh.nodes[mesh.bvh.root].aabb_max[1],
-				mesh.bvh.nodes[mesh.bvh.root].aabb_max[2]);
-	Vec3 MIN = Vec3(mesh.bvh.nodes[mesh.bvh.root].aabb_min[0],
-				mesh.bvh.nodes[mesh.bvh.root].aabb_min[1],
-				mesh.bvh.nodes[mesh.bvh.root].aabb_min[2]);
+	Vec3 MAX = Vec3(mesh.bvh.nodes[1].aabb_max[0],
+				mesh.bvh.nodes[1].aabb_max[1],
+				mesh.bvh.nodes[1].aabb_max[2]);
+	Vec3 MIN = Vec3(mesh.bvh.nodes[1].aabb_min[0],
+				mesh.bvh.nodes[1].aabb_min[1],
+				mesh.bvh.nodes[1].aabb_min[2]);
 	Vec3 d = MAX - MIN;
 	Vec3 c = d * 0.5 + MIN;
 	Vec3 ss[101][101];
@@ -69,6 +70,21 @@ int main(int argc, char **argv){
 	std::cout << "CEN" << c << std::endl;
 
 
+	int count = 0;
+	for(int i = 0;i < 101;i++){
+		for(int j = 0;j < 101;j++){
+			Intersection_point *inter = mesh.get_intersection(Ray(ss[i][j],ds[i][j]));
+			if(inter != nullptr)count++;
+		}
+	}
+	ProfilerStart("/tmp/traverse.prof");
+	for(int i = 0;i < 101;i++){
+		for(int j = 0;j < 101;j++){
+			mesh.get_intersection(Ray(ss[i][j],ds[i][j]));
+		}
+	}
+	ProfilerStop();
+
 	double ti = 0;
 	for(int ccc = 0 ;ccc < 100;ccc++){
 	std::chrono::system_clock::time_point start,end;
@@ -78,7 +94,6 @@ int main(int argc, char **argv){
 			mesh.get_intersection(Ray(ss[i][j],ds[i][j]));
 		}
 	}
-
 	end = std::chrono::system_clock::now();
 
     auto elapsed = std::chrono::duration_cast< std::chrono::milliseconds >(end - start).count();
@@ -90,6 +105,7 @@ int main(int argc, char **argv){
 	int ii = 76,jj = 48;
 	Intersection_point* inter =	mesh.get_intersection(Ray(ss[ii][jj],ds[ii][jj]));
 	
+	std::cout << "衝突回数 " << count << std::endl;
 	std::cout << "origin" << std::setprecision(10) << ss[ii][jj] << std::endl;
 	std::cout << "direction" << std::setprecision(10) << ds[ii][jj].normalized() << std::endl;
 	
