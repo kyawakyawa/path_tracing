@@ -195,7 +195,7 @@ struct BVH {
 	Intersection_point* traverse(const Ray &ray,const std::vector< Polygon > &polygons) const{
 		R start[3];start[0] = ray.start.x;start[1] = ray.start.y;start[2] = ray.start.z;
 		R direction[3];direction[0] = 1.0 / ray.direction.x;direction[1] = 1.0 / ray.direction.y;direction[2] = 1.0 / ray.direction.z;
-		return traverse(ray,polygons,1,start,direction);
+		return traverse(ray,polygons,1,start,direction,1000000000.0);
 	}
 
 	/*Intersection_point* traverse(const Ray &ray,const std::vector< Polygon > &polygons,const int now) const {
@@ -239,11 +239,8 @@ struct BVH {
 		}
 	}*/
 
-	Intersection_point* traverse(const Ray &ray,const std::vector< Polygon > &polygons,const int now,const R start[],const R direction[]) const {
+	Intersection_point* traverse(const Ray &ray,const std::vector< Polygon > &polygons,const int now,const R start[],const R direction[],R min_d) const {
 		const Node_BVH &node = nodes[now];
-		if(node.polygon_index > -1){
-			return polygon_intersection(ray,polygons[nodes[now].polygon_index]);
-		}
 
 		R t_max = 1000000000000.0;
 		R t_min = -1000000000000.0;
@@ -268,9 +265,17 @@ struct BVH {
 
 		if((t_min - t_max > EPS))
 			return nullptr;
+		if(min_d < t_min)
+			return nullptr;
 
-		Intersection_point *left = traverse(ray,polygons,now * 2,start,direction);
-		Intersection_point *right = traverse(ray,polygons,now * 2 + 1,start,direction);
+		if(node.polygon_index > -1){
+			return polygon_intersection(ray,polygons[nodes[now].polygon_index]);
+		}
+
+		Intersection_point *left = traverse(ray,polygons,now * 2,start,direction,min_d);
+		if(left != nullptr && min_d > left->distance)
+			min_d = left->distance;
+		Intersection_point *right = traverse(ray,polygons,now * 2 + 1,start,direction,min_d);
 
 		if(left == nullptr)
 			return right;
@@ -292,7 +297,8 @@ struct BVH {
 
 		Intersection_point* comp1 = nullptr;
 		const Vec3 &r = ray.direction;
-		for(int i = 0;i < polygon.vertex.size() - 2;i++){
+		const int n = polygon.vertex.size() - 2;
+		for(int i = 0;i < n;i++){
 			const Vec3 T = ray.start - polygon.vertex[0];
 			const Vec3 E1 = polygon.vertex[i + 1] - polygon.vertex[0];
 			const Vec3 E2 = polygon.vertex[i + 2] - polygon.vertex[0];
