@@ -10,7 +10,7 @@
 #include "glout.h"
 
 int main(int argc, char **argv){
-    Scene scene(600,600);
+    Scene scene(Camera(600,600,Vec3(-70,52.0,52.0),Vec3(1.0,-0.04,0.0),Vec3(0.0,1.0,0.0),50.0));
     
 	R a = 0.85;
 	R b = 0.10;
@@ -20,7 +20,7 @@ int main(int argc, char **argv){
 		return 0;
 	}
 
-	std::string inputfile = argv[1];
+	/*std::string inputfile = argv[1];
 	tinyobj::attrib_t attrib;
 	std::vector<tinyobj::shape_t> shapes;
 	std::vector<tinyobj::material_t> materials;
@@ -35,11 +35,13 @@ int main(int argc, char **argv){
 
 	if (!ret) {
   		exit(1);
-	}
+	}*/
 
 	//std::cout << attrib.vertices.size() << std::endl;
 
-	scene.add(new Mesh(attrib,shapes,Material(FColor(a + 0.10,a - 0.30,a - 0.30))));//うすピンク
+	//scene.add(new Mesh(attrib,shapes,Material(FColor(a + 0.10,a - 0.30,a - 0.30))));//うすピンク
+	//scene.add(new Mesh(argv[1]));
+	scene.add(new Mesh(argv[1],40,Vec3(70,20,50),Vec3(1,1,1),0));
 	//scene.add(new Mesh(attrib,shapes,Material(FColor(a ,a ,a))));//白
 	//scene.add(new Mesh(attrib,shapes,Material(FColor(240.0 / 255,210.0 / 255,37.0 / 255),MT_PERFECT_REF)));
 	//scene.add(new Mesh(attrib,shapes,Material(MT_REFRACTION)));

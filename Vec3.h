@@ -94,6 +94,24 @@ inline constexpr Vec3 cross(const Vec3 &v1,const Vec3 &v2){
 		(v1.z * v2.x) - (v1.x * v2.z),
 		(v1.x * v2.y) - (v1.y * v2.x));
 }
+
+inline Vec3 rotate(const Vec3 &p,const Vec3 &r,const R theta){
+	const R s = std::sin(theta * 0.5),c = std::cos(theta * 0.5);
+
+	const R w1 = c;
+	const R x1 = -r.x * s;
+	const R y1 = -r.y * s;
+	const R z1 = -r.z * s;
+
+	const R w0 = x1 * p.x + y1 * p.y + z1 * p.z;
+	const R x0 = w1 * p.x - y1 * p.z + z1 * p.y;
+	const R y0 = w1 * p.y - z1 * p.x + x1 * p.z;
+	const R z0 = w1 * p.z - x1 * p.y + y1 * p.x;
+
+	return Vec3(w0 * x1 + w1 * x0 + y0 * z1 - z0 * y1,
+				w0 * y1 + w1 * y0 + z0 * x1 - x0 * z1,
+				w0 * z1 + w1 * z0 + x0 * y1 - y0 * x1);
+}
 	
 template <class Char> // 出力ストリーム
 inline std::basic_ostream<Char>& operator <<(std::basic_ostream<Char>& os, const Vec3& v){

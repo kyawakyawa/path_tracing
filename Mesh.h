@@ -2,6 +2,7 @@
 
 #include <vector>
 
+#define TINYOBJLOADER_IMPLEMENTATION 
 #include "tiny_obj_loader.h"
 
 #include "Vec3.h"
@@ -17,13 +18,30 @@ struct Mesh : public Shape{
 	BVH bvh;
 
 	Mesh() = delete;
-	inline Mesh(const tinyobj::attrib_t &at,const std::vector< tinyobj::shape_t > &shs,const Material &m): Shape(m){
+	inline Mesh(const std::string inputfile,const R magni,const Vec3 slide,Vec3 r,R theta): Shape(Material(FColor(240.0 / 255,210.0 / 255,37.0 / 255),MT_PERFECT_REF)){
+		r = r.normalized();
+
+		tinyobj::attrib_t at;
+		std::vector<tinyobj::shape_t> shs;
+		std::vector<tinyobj::material_t> materials;
+
+		std::string err;
+		bool ret = tinyobj::LoadObj(&at, &shs, &materials, &err, inputfile.c_str());
+  
+		if (!err.empty()) { // `err` may contain warning message.
+	 		std::cerr << err << std::endl;
+		}
+
+		if (!ret) {
+	  		exit(1);
+		}
+
 		for(const auto &sh : shs){
 			int p = 0;
 			for(const auto &nfv : sh.mesh.num_face_vertices){
 				Polygon poly;
 				for(int i = 0;i < nfv;i++){
-					poly.vertex.push_back(get_vertice(at,sh.mesh.indices[p].vertex_index));
+					poly.vertex.push_back(get_vertice(at,sh.mesh.indices[p].vertex_index,magni,slide,r,theta));
 					p++;
 				}
 				polygons.push_back(poly);
@@ -41,13 +59,15 @@ struct Mesh : public Shape{
 		}*/
 	};
 
-	inline Vec3 get_vertice(const tinyobj::attrib_t &at,int index){
+	inline Vec3 get_vertice(const tinyobj::attrib_t &at,const int index,const R magni,const Vec3 slide,const Vec3 r,const R theta){
 		//return Vec3(at.vertices[index * 3],at.vertices[index * 3 + 1],at.vertices[index * 3 + 2]) * 30 + Vec3(50,10,70);//bunny
 		//return Vec3(at.vertices[index * 3],at.vertices[index * 3 + 1],at.vertices[index * 3 + 2]) * 70 + Vec3(70,20,50);//dragon
 		//return Vec3(at.vertices[index * 3],at.vertices[index * 3 + 1],at.vertices[index * 3 + 2]) * (R)(0.2) + Vec3(50,10,50);//car
 		//return Vec3(at.vertices[index * 3],at.vertices[index * 3 + 1],at.vertices[index * 3 + 2]) + Vec3(50,60,70);//sibenik
 		//return Vec3(at.vertices[index * 3],at.vertices[index * 3 + 1],at.vertices[index * 3 + 2]) * 70 + Vec3(50,30,60);//buddha
-		return Vec3(at.vertices[index * 3],at.vertices[index * 3 + 1],at.vertices[index * 3 + 2]) * 100;
+		//return Vec3(at.vertices[index * 3],at.vertices[index * 3 + 1],at.vertices[index * 3 + 2]) * 100;
+
+		return rotate(Vec3(at.vertices[index * 3],at.vertices[index * 3 + 1],at.vertices[index * 3 + 2]),r,theta) * magni + slide;
 	}
 
 	static inline Intersection_point* polygon_intersection(const Ray &ray,const Polygon &polygon) {

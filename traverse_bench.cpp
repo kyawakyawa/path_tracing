@@ -13,7 +13,7 @@
 #include "Sphere.h"
 #include "Plane.h"
 #include "Mesh.h"
-//#include "glout.h"
+#include "glout.h"
 #include "BVH.h"
 
 int main(int argc, char **argv){
@@ -25,7 +25,7 @@ int main(int argc, char **argv){
 		return 0;
 	}
 
-	std::string inputfile = argv[1];
+	/*std::string inputfile = argv[1];
 	tinyobj::attrib_t attrib;
 	std::vector<tinyobj::shape_t> shapes;
 	std::vector<tinyobj::material_t> materials;
@@ -40,11 +40,12 @@ int main(int argc, char **argv){
 
 	if (!ret) {
   		exit(1);
-	}
+	}*/
 
 	//std::cout << attrib.vertices.size() << std::endl;
 
-	Mesh mesh(attrib,shapes,Material(FColor(b,b,a)));
+	//Mesh mesh(attrib,shapes,Material(FColor(a,a,a)));
+	Mesh mesh(argv[1],100.0,Vec3(0,0,0),Vec3(1,1,1),0);
 
 	Vec3 MAX = Vec3(mesh.bvh.nodes[1].aabb_max[0],
 				mesh.bvh.nodes[1].aabb_max[1],
@@ -119,10 +120,27 @@ int main(int argc, char **argv){
         printf("%lf ",bvh.nodes[bvh.root].aabb_min[i]);
     }
     printf("\n");*/
-	//Scene scene(600,600);
+	Scene scene(600,600);
     
-	//scene.add(&mesh);
-	//drawgl(argc,argv,scene);
+	/*inputfile = "/home/kai/programing/cpp/path_tracing/obj/plane.obj";
+
+
+	ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &err, inputfile.c_str());
+  
+	if (!err.empty()) { // `err` may contain warning message.
+ 		std::cerr << err << std::endl;
+	}
+
+	if (!ret) {
+  		exit(1);
+	}
+
+
+	scene.add(new Mesh(attrib,shapes,Material(FColor(a,a,a))));*/
+
+
+	scene.add(&mesh);
+	drawgl(argc,argv,scene);
 	
 	return 0;
 }

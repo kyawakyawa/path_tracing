@@ -26,12 +26,13 @@ struct Camera{
 
     Camera() = delete;
     Camera(int w,int h): picW(w),picH(h),width(30.0 * w / h),height(30.0),x(cross(dir,up).normalized() * width),y(cross(dir,x).normalized() * height),center(dir * dist) {};
+    Camera(int w,int h,Vec3 p,Vec3 d,Vec3 u,R ds): position(p),dir(d.normalized()),up(u.normalized()),dist(ds),picW(w),picH(h),width(30.0 * w / h),height(30.0),x(cross(dir,up).normalized() * width),y(cross(dir,x).normalized() * height),center(dir * dist){};
 
-    Ray get_ray(int i,int j){
+    Ray get_ray(int i,int j) const {
         return Ray(position,center + ((R)j / picW - 0.5) * x + ((R)i / picH - 0.5) * y);
     }
 
-    Ray get_ray(int sy,int sx,int supersamples,int i,int j){
+    Ray get_ray(int sy,int sx,int supersamples,int i,int j) const{
         const R d = 1.0 / supersamples;
         const R dx = sx * d + d * 0.5;
         const R dy = sy * d + d * 0.5;

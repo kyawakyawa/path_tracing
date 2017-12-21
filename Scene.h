@@ -5,7 +5,8 @@
 #include "Shape.h"
 #include "Intersection_info.h"
 #include "Camera.h"
-//#include <GL/glut.h>
+#include "Infinity_light_source.h"
+#include <GL/glut.h>
 
 unsigned long long  xor128(void) {
     // x, y, z, w が乱数のシード
@@ -27,13 +28,15 @@ struct Scene{
 	const int HEIGHT = 480;//縦のピクセル
 	const int WIDTH = 480;//横のピクセル
 	const R INF = 1000000000.0;
-	const FColor back;//物体がないときの色
+	//const FColor back;//物体がないときの色
+	const Infinity_light_source back;
 	const int MAX_DEPTH = 4;//再帰の深さの最大値
 	FColor *img;//ピクセルごとの色を保持
+	const Camera camera;
 
-	inline Scene(): back(FColor(100.0 / 255,149.0 / 255,237.0 / 255)),img(new FColor[HEIGHT * WIDTH]){}
-	inline Scene(int w,int h) :WIDTH(w),HEIGHT(h),back(FColor(100.0 / 255,149.0 / 255,237.0 / 255)),img(new FColor[HEIGHT * WIDTH]){};
-
+	inline Scene(): back(/*FColor(100.0 / 255,149.0 / 255,237.0 / 255)*/"/home/kai/Documents/hdr/PaperMill_E_3k.hdr"),img(new FColor[HEIGHT * WIDTH]),camera(480,480){}
+	inline Scene(int w,int h) :WIDTH(w),HEIGHT(h),back(/*FColor(100.0 / 255,149.0 / 255,237.0 / 255)*/"/home/kai/Documents/hdr/modern_buildings_night_16k.hdr"),img(new FColor[HEIGHT * WIDTH]),camera(WIDTH,HEIGHT){};
+	inline Scene(Camera c) :WIDTH(c.picW),HEIGHT(c.picH),back(/*FColor(100.0 / 255,149.0 / 255,237.0 / 255)*/"/home/kai/Documents/hdr/modern_buildings_night_16k.hdr"),img(new FColor[HEIGHT * WIDTH]),camera(c){};
 	inline void add(Shape *shape){//物体を追加する
 		shapes.push_back(shape);
 	}
@@ -81,7 +84,7 @@ struct Scene{
 		const Intersection_info *intersection_info = get_intersection_of_nearest(ray);
 			
 		if(intersection_info == nullptr){//物体が存在しない
-			return back;
+			return back.get_radiance(ray.direction);
 		}
 		
 		const Intersection_point *intersection = intersection_info->intersection_point;
@@ -170,7 +173,6 @@ struct Scene{
 	void compute(int n,int N){//サンプル回数とすでに何回サンプリングしているか
 		if(N == 0)
 			init_img();
-		Camera camera(WIDTH,HEIGHT);
 		#pragma omp parallel for schedule(dynamic, 1) num_threads(8)
 		for(int i = 0;i < HEIGHT;i++){
 			for(int j = 0;j < WIDTH;j++){
@@ -188,7 +190,6 @@ struct Scene{
 	void compute(int n,int N,int supersamples){//サンプル回数とすでに何回サンプリングしているか
 		if(N == 0)
 			init_img();
-		Camera camera(WIDTH,HEIGHT);
 		const R r = 1.0 / (n * supersamples * supersamples + N);
 		#pragma omp parallel for schedule(dynamic, 1) num_threads(8)
 		for(int i = 0;i < HEIGHT;i++){
