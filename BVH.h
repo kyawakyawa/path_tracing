@@ -6,9 +6,9 @@
 #include "tiny_obj_loader.h"
 
 #include "Vec3.h"
-#include "Intersection_point.h"
 #include "Node_BVH.h"
 #include "Polygon.h"
+#include "Polygon_info.h"
 
 //typedef std::vector< Vec3 > Polygon;
 
@@ -37,9 +37,10 @@ struct BVH {
 	int root = 0;
 
 	BVH() = default;
-	BVH(std::vector< Polygon > &polygons) : nodes(polygons.size() * 2){
+	//BVH(std::vector< Material > &ms): materials(ms){};
+	/*BVH(std::vector< Polygon > &polygons,std::vector< Material > &ms) : nodes(polygons.size() * 2){
 		constraction(polygons);
-	};
+	};*/
 
 	void constraction(std::vector< Polygon > &polygons){
 		make_polygons_aabbs(polygons);
@@ -192,7 +193,7 @@ struct BVH {
 		return max_z_a < max_z_b;
 	}*/
 
-	Intersection_point* traverse(const Ray &ray,const std::vector< Polygon > &polygons) const{
+	Polygon_info* traverse(const Ray &ray,const std::vector< Polygon > &polygons) const{
 		R start[3];start[0] = ray.start.x;start[1] = ray.start.y;start[2] = ray.start.z;
 		R direction[3];direction[0] = 1.0 / ray.direction.x;direction[1] = 1.0 / ray.direction.y;direction[2] = 1.0 / ray.direction.z;
 		return traverse(ray,polygons,1,start,direction,1000000000.0);
@@ -239,7 +240,7 @@ struct BVH {
 		}
 	}*/
 
-	Intersection_point* traverse(const Ray &ray,const std::vector< Polygon > &polygons,const int now,const R start[],const R direction[],R min_d) const {
+	Polygon_info* traverse(const Ray &ray,const std::vector< Polygon > &polygons,const int now,const R start[],const R direction[],R min_d) const {
 		const Node_BVH &node = nodes[now];
 
 		R t_max = 1000000000000.0;
@@ -269,13 +270,13 @@ struct BVH {
 			return nullptr;
 
 		if(node.polygon_index > -1){
-			return polygon_intersection(ray,polygons[nodes[now].polygon_index]);
+			return polygon_intersection(ray,polygons[nodes[now].polygon_index],node.polygon_index);
 		}
 
-		Intersection_point *left = traverse(ray,polygons,now * 2,start,direction,min_d);
+		Polygon_info *left = traverse(ray,polygons,now * 2,start,direction,min_d);
 		if(left != nullptr && min_d > left->distance)
 			min_d = left->distance;
-		Intersection_point *right = traverse(ray,polygons,now * 2 + 1,start,direction,min_d);
+		Polygon_info *right = traverse(ray,polygons,now * 2 + 1,start,direction,min_d);
 
 		if(left == nullptr)
 			return right;
@@ -292,10 +293,9 @@ struct BVH {
 		}
 	}
 
-	static inline Intersection_point* polygon_intersection(const Ray &ray,const Polygon &polygon) {
+	static inline Polygon_info* polygon_intersection(const Ray &ray,const Polygon &polygon,const int index) {
 		const Vec3 &normal = polygon.normal;//(cross(polygon.vertex[1] - polygon.vertex[0],polygon.vertex[2] - polygon.vertex[1])).normalized();
 
-		Intersection_point* comp1 = nullptr;
 		const Vec3 &r = ray.direction;
 		const int n = polygon.vertex.size() - 2;
 		for(int i = 0;i < n;i++){
@@ -314,8 +314,7 @@ struct BVH {
 			const R u = P * T * inv;
 			const R v = Q * r * inv;
 			if(t > EPS && u > EPS && u < 1.0 && v > EPS && v < 1.0){
-				comp1 = new Intersection_point(t,ray.start + t * r,normal);
-				return comp1;
+				return new Polygon_info(t,index);
 			}
 		}
 		return nullptr;

@@ -45,9 +45,9 @@ int main(int argc, char **argv){
 	//std::cout << attrib.vertices.size() << std::endl;
 
 	//Mesh mesh(attrib,shapes,Material(FColor(240.0 / 255,210.0 / 255,37.0 / 255),MT_PERFECT_REF/*FColor(a,a,a)*/));
-	Mesh mesh(argv[1],40,Vec3(70,20,50),Vec3(2432.0,9328.0,782.0),3.14);
+	Mesh mesh(argv[1],40,Vec3(70,20,50),Vec3(2432.0,9328.0,782.0),0);
 
-	Scene scene(Camera(600,600,Vec3(-70,-5.0,52.0),Vec3(1.0,0.2,0.0),Vec3(0.0,1.0,1.0),50.0));
+	Scene scene(Camera(600,600,Vec3(-70,52.0,52.0),Vec3(1.0,-0.04,0.0),Vec3(0.0,1.0,0.0),50.0));
     
 	/*inputfile = "/home/kai/programing/cpp/path_tracing/obj/plane.obj";
 
