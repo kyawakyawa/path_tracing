@@ -39,17 +39,17 @@ struct BVH {
 	BVH() = default;
 	//BVH(std::vector< Material > &ms): materials(ms){};
 	/*BVH(std::vector< Polygon > &polygons,std::vector< Material > &ms) : nodes(polygons.size() * 2){
-		constraction(polygons);
+		construction(polygons);
 	};*/
 
-	void constraction(std::vector< Polygon > &polygons){
+	void construction(std::vector< Polygon > &polygons){
 		make_polygons_aabbs(polygons);
 		int n = 1;
 		while(polygons.size() > n){
 			n *= 2;
 		}
 		nodes.resize(n * 2 + 100);
-		constraction(polygons,polygons.begin(),polygons.end(),1);
+		construction(polygons,polygons.begin(),polygons.end(),1);
 	}
 
 	void make_polygons_aabbs(std::vector< Polygon > &polygons){
@@ -66,7 +66,7 @@ struct BVH {
 		}
 	}
 
-	void constraction(std::vector< Polygon > &polygons,std::vector< Polygon >::iterator left,std::vector< Polygon >::iterator right,int now){
+	void construction(std::vector< Polygon > &polygons,std::vector< Polygon >::iterator left,std::vector< Polygon >::iterator right,int now){
 		int n = std::distance(left,right);
 		Node_BVH node;
 
@@ -100,10 +100,10 @@ struct BVH {
 			std::sort(left,right,compZ);
 		
 		if(n / 2 > 0){
-			constraction(polygons,left,left + n / 2 ,now * 2);
+			construction(polygons,left,left + n / 2 ,now * 2);
 		}
 		if(std::distance(left + n / 2,right) > 0){
-			constraction(polygons,left + n / 2,right,now * 2 + 1);
+			construction(polygons,left + n / 2,right,now * 2 + 1);
 		}
 		nodes[now] = node;//nodes.push_back(node);
 		//return nodes.size() - 1;
@@ -294,8 +294,6 @@ struct BVH {
 	}
 
 	static inline Polygon_info* polygon_intersection(const Ray &ray,const Polygon &polygon,const int index) {
-		const Vec3 &normal = polygon.normal;//(cross(polygon.vertex[1] - polygon.vertex[0],polygon.vertex[2] - polygon.vertex[1])).normalized();
-
 		const Vec3 &r = ray.direction;
 		const int n = polygon.vertex.size() - 2;
 		for(int i = 0;i < n;i++){
@@ -306,21 +304,22 @@ struct BVH {
 			const Vec3 Q = cross(T,E1);
 
 			const R bunbo = P * E1;
-			if(bunbo < EPS && bunbo > -EPS)
+			if(bunbo < EPS * EPS && bunbo > -EPS * EPS)
 				return nullptr;
 			const R inv = 1.0 / bunbo;
 
 			const R t = Q * E2 * inv;
 			const R u = P * T * inv;
 			const R v = Q * r * inv;
-			if(t > EPS && u > EPS && u < 1.0 && v > EPS && v < 1.0){
+			if(t > EPS && u > 0 && v > 0 && u + v < 1.0){
 				return new Polygon_info(t,index);
 			}
 		}
 		return nullptr;
 
-
-		/*const Vec3 &d = ray.direction;
+		/*
+		const Vec3 &normal = polygon.normal;//(cross(polygon.vertex[1] - polygon.vertex[0],polygon.vertex[2] - polygon.vertex[1])).normalized();
+		const Vec3 &d = ray.direction;
 		Vec3 s2;
 
 		////平面上のもう一つの点を取得
@@ -349,25 +348,8 @@ struct BVH {
 				return nullptr;
 			}
 		}
-		Intersection_point* comp2 = new Intersection_point(t,ray.start + t * d,normal);
-
-		if((comp1 == nullptr && comp2 != nullptr) || (comp1 != nullptr && comp2 == nullptr))
-			std::cout << "ちがうだろー" << std::endl;
-		else if(comp1 != nullptr){
-			if((comp1->position - comp2->position).abs() > EPS){
-				std::cout << "交点のズレ" << comp1->position - comp2->position << std::endl;
-			}
-			if((comp1->normal - comp2->normal).abs() > EPS){
-				std::cout << "法線のズレ" << comp1->normal - comp2->normal << std::endl;
-			}
-			if(abs(comp1->distance - comp2->distance) > EPS){
-				std::cout << "距離のズレ" << comp1->normal - comp2->normal << std::endl;
-			}
-		}
-
-		delete comp1;
-
-		return comp2;*/
+		return new Polygon_info(t,index);*/
+		
 	}
 
 	void out() const{

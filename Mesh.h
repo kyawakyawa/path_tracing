@@ -3,6 +3,7 @@
 #include <vector>
 
 #define TINYOBJLOADER_IMPLEMENTATION 
+//#define TINYOBJLOADER_USE_DOUBLE
 #include "tiny_obj_loader.h"
 
 #include "Vec3.h"
@@ -62,10 +63,23 @@ struct Mesh : public Shape{
 		}else{
 			for(auto &mtl : mtls){
 				materials.push_back(Material(FColor(mtl.diffuse[0],mtl.diffuse[1],mtl.diffuse[1])));
+				if(!mtl.diffuse_texname.empty()){
+					textures.push_back(Texture(mtl.diffuse_texname));
+				}
+			}
+		}
+		if(textures.size() > 0){
+			for(auto &polygon : polygons){
+				for(int i = 0;i < textures.size();i++){
+					if(textures[i].name == mtls[polygon.mtl_id].diffuse_texname){
+						polygon.texture_id = i;
+						break;
+					}
+				}
 			}
 		}
 
-		bvh.constraction(polygons);
+		bvh.construction(polygons);
 		/*for(const auto &polygon : polygons){
 			for(const auto &v : polygon){
 				std::cout << v << " ";
@@ -83,6 +97,7 @@ struct Mesh : public Shape{
 		//return Vec3(at.vertices[index * 3],at.vertices[index * 3 + 1],at.vertices[index * 3 + 2]) * 100;
 
 		return rotate(Vec3(at.vertices[index * 3],at.vertices[index * 3 + 1],at.vertices[index * 3 + 2]),r,theta) * magni + slide;
+		//return Vec3(at.vertices[index * 3],at.vertices[index * 3 + 1],at.vertices[index * 3 + 2]) * magni + slide;
 	}
 
 	static inline Vec3 get_vertice2(const tinyobj::attrib_t &at,const int index){
@@ -128,15 +143,19 @@ struct Mesh : public Shape{
 			const Vec3 Q = cross(T,E1);
 
 			const R bunbo = P * E1;
-			if(bunbo < EPS && bunbo > -EPS)
+			if(bunbo < EPS * EPS && bunbo > -EPS * EPS)
 				return nullptr;
 			const R inv = 1.0 / bunbo;
 
 			const R t = Q * E2 * inv;
 			const R u = P * T * inv;
 			const R v = Q * r * inv;
-			if(t > EPS && u > EPS && u < 1.0 && v > EPS && v < 1.0){
+			if(t > EPS && u > 0 && v > 0 && u + v < 1.0){
+				if(polygon.texture_id >= 0){
+					return new Intersection_point(t,ray.start + t * r,normal,Material(textures[polygon.texture_id].get_kd(u * (polygon.uv[i + 1] - polygon.uv[0]) + v * (polygon.uv[i + 2] - polygon.uv[0]) + polygon.uv[0])));
+				}
 				return new Intersection_point(t,ray.start + t * r,normal,materials[polygon.mtl_id]);
+				//return new Intersection_point(t,ray.start + t * r,normal,Material(FColor(0.7,0.7,0.7)));
 			}
 		}
 		return nullptr;

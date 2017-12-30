@@ -14,8 +14,12 @@ struct Plane: public Shape{
 	const R edge = 0.25;//チェックの一辺の長さ
 
 	Plane() = delete;
-	inline Plane(Vec3 n,Vec3 p,Material m): Shape(m),normal(n.normalized()),position(p),type(PL_DEFAULT){};
-	inline Plane(Vec3 n,Vec3 p,Plane_type t): Shape(Material(MT_DEFAULT)),normal(n.normalized()),position(p),type(t){};
+	inline Plane(Vec3 n,Vec3 p,Material m): normal(n.normalized()),position(p),type(PL_DEFAULT){
+		materials.push_back(m);
+	};
+	inline Plane(Vec3 n,Vec3 p,Plane_type t): normal(n.normalized()),position(p),type(t){
+		materials.push_back(Material(FColor(0.75,0.75,0.75)));
+	};
 	
 	inline Intersection_point* get_intersection(const Ray &ray) const{//交点と距離を取得
 		const Vec3 &d = ray.direction;
@@ -39,7 +43,7 @@ struct Plane: public Shape{
 		if(t < EPS)//平面が視線の後側
 			return nullptr;
 
-		return new Intersection_point(t,ray.start + t * d,normal);
+		return new Intersection_point(t,ray.start + t * d,normal,get_material(ray.start + t * d));
 	}
 
 	inline Material get_material(const Vec3 &position) const {
@@ -53,6 +57,6 @@ struct Plane: public Shape{
 
 			return (even_x == even_z) ? Material(FColor(0.75,0.75,0.75)) : Material(FColor(0.05,0.05,0.05));
 		}
-		return material;
+		return materials[0];
 	}
 };

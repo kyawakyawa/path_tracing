@@ -34,8 +34,8 @@ struct Scene{
 	const Camera camera;
 
 	inline Scene(): back(/*FColor(100.0 / 255,149.0 / 255,237.0 / 255)*/"hdr/PaperMill_E_3k.hdr"),img(new FColor[HEIGHT * WIDTH]),camera(480,480){}
-	inline Scene(int w,int h) :WIDTH(w),HEIGHT(h),back(/*FColor(100.0 / 255,149.0 / 255,237.0 / 255)*/"hdr/modern_buildings_night_16k.hdr"),img(new FColor[HEIGHT * WIDTH]),camera(WIDTH,HEIGHT){};
-	inline Scene(Camera c) :WIDTH(c.picW),HEIGHT(c.picH),back(/*FColor(100.0 / 255,149.0 / 255,237.0 / 255)*/"hdr/PaperMill_E_3k.hdr"),img(new FColor[HEIGHT * WIDTH]),camera(c){};
+	inline Scene(int w,int h) :HEIGHT(h),WIDTH(w),back(/*FColor(100.0 / 255,149.0 / 255,237.0 / 255)*/"hdr/PaperMill_E_3k.hdr"),img(new FColor[HEIGHT * WIDTH]),camera(WIDTH,HEIGHT){};
+	inline Scene(Camera c) :HEIGHT(c.picH),WIDTH(c.picW),back(/*FColor(100.0 / 255,149.0 / 255,237.0 / 255)*/"hdr/PaperMill_E_3k.hdr"),img(new FColor[HEIGHT * WIDTH]),camera(c){};
 	inline void add(Shape *shape){//物体を追加する
 		shapes.push_back(shape);
 	}
@@ -87,7 +87,7 @@ struct Scene{
 		}
 		
 		const Intersection_point *intersection = intersection_info->intersection_point;
-		const Shape *intersection_shape = intersection_info->shape;
+		//const Shape *intersection_shape = intersection_info->shape;
 		const Material material = intersection->material;//intersection_shape->get_material(intersection->position);
 		const Vec3 normal = ((ray.direction * intersection->normal < 0.0) ? 1.0 : -1.0) * intersection->normal;
 		
@@ -215,6 +215,9 @@ struct Scene{
 
 		for(int i = 0;i < HEIGHT * WIDTH;i++)
 			img[i].print255();
+	}
+	void debug(int sample,int supersamples) {
+		compute(sample,0,supersamples);
 	}
 
 	~Scene(){

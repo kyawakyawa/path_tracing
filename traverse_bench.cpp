@@ -1,17 +1,13 @@
-#define TINYOBJLOADER_IMPLEMENTATION 
 #include<stdio.h>
 #include<iomanip>
 #include<chrono>
 #include <iostream>
 #include<gperftools/profiler.h>
 
+
 //https://qiita.com/tyanmahou/items/8497d6e815ebf7ea90c6
 
-#include "tiny_obj_loader.h"
-
 #include "Scene.h"
-#include "Sphere.h"
-#include "Plane.h"
 #include "Mesh.h"
 #include "glout.h"
 #include "BVH.h"
@@ -25,26 +21,6 @@ int main(int argc, char **argv){
 		return 0;
 	}
 
-	/*std::string inputfile = argv[1];
-	tinyobj::attrib_t attrib;
-	std::vector<tinyobj::shape_t> shapes;
-	std::vector<tinyobj::material_t> materials;
-
-
-	std::string err;
-	bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &err, inputfile.c_str());
-  
-	if (!err.empty()) { // `err` may contain warning message.
- 		std::cerr << err << std::endl;
-	}
-
-	if (!ret) {
-  		exit(1);
-	}*/
-
-	//std::cout << attrib.vertices.size() << std::endl;
-
-	//Mesh mesh(attrib,shapes,Material(FColor(a,a,a)));
 	Mesh mesh(argv[1],100.0,Vec3(0,0,0),Vec3(1,1,1),0);
 
 	Vec3 MAX = Vec3(mesh.bvh.nodes[1].aabb_max[0],
@@ -76,12 +52,13 @@ int main(int argc, char **argv){
 		for(int j = 0;j < 101;j++){
 			Intersection_point *inter = mesh.get_intersection(Ray(ss[i][j],ds[i][j]));
 			if(inter != nullptr)count++;
+			delete inter;
 		}
 	}
 	ProfilerStart("/tmp/traverse.prof");
 	for(int i = 0;i < 101;i++){
 		for(int j = 0;j < 101;j++){
-			mesh.get_intersection(Ray(ss[i][j],ds[i][j]));
+			delete mesh.get_intersection(Ray(ss[i][j],ds[i][j]));
 		}
 	}
 	ProfilerStop();
@@ -92,7 +69,7 @@ int main(int argc, char **argv){
     start = std::chrono::system_clock::now();
 	for(int i = 0;i < 101;i++){
 		for(int j = 0;j < 101;j++){
-			mesh.get_intersection(Ray(ss[i][j],ds[i][j]));
+			delete mesh.get_intersection(Ray(ss[i][j],ds[i][j]));
 		}
 	}
 	end = std::chrono::system_clock::now();
@@ -112,35 +89,6 @@ int main(int argc, char **argv){
 	
 	if(nullptr != inter)std::cout << std::setprecision(10) << inter->position << std::endl;
 	delete inter;
-    /*for(int i = 0;i < 3;i++){
-        printf("%lf ",bvh.nodes[bvh.root].aabb_max[i]);
-    }
-    printf("\n");
-    for(int i = 0;i < 3;i++){
-        printf("%lf ",bvh.nodes[bvh.root].aabb_min[i]);
-    }
-    printf("\n");*/
-	Scene scene(600,600);
-    
-	/*inputfile = "/home/kai/programing/cpp/path_tracing/obj/plane.obj";
 
-
-	ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &err, inputfile.c_str());
-  
-	if (!err.empty()) { // `err` may contain warning message.
- 		std::cerr << err << std::endl;
-	}
-
-	if (!ret) {
-  		exit(1);
-	}
-
-
-	scene.add(new Mesh(attrib,shapes,Material(FColor(a,a,a))));*/
-
-
-	scene.add(&mesh);
-	drawgl(argc,argv,scene);
-	
 	return 0;
 }

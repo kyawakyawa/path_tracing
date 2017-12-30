@@ -14,11 +14,19 @@ struct Infinity_light_source{
     int height = 1;
     std::vector< FColor > light;
     Infinity_light_source(){
-        light.push_back(FColor(100.0 / 255,149.0 / 255,237.0 / 255));
+        //light.push_back(FColor(100.0 / 255,149.0 / 255,237.0 / 255));
+        light.push_back(FColor(0.75,0.75,0.75));
     }
     Infinity_light_source(std::string filename){
         int n;
         float *pixel = stbi_loadf(filename.c_str(), &width, &height, &n, 0);
+		if(pixel == nullptr){
+			width = 1;
+			height = 1;
+        	//light.push_back(FColor(100.0 / 255,149.0 / 255,237.0 / 255));
+            light.push_back(FColor(0.75,0.75,0.75));
+			return;
+		}
 
         for(int i = 0;i < width * height;i++){
             light.push_back(FColor(pixel[i * n],pixel[i * n + 1],pixel[i * n + 2]));
@@ -27,8 +35,10 @@ struct Infinity_light_source{
     }
 
     FColor get_radiance(const Vec3 &direction) const{//正規化されている必要あり
-        const R theta = acos(direction.y);
-        const R phi = atan(direction.z / direction.x) ;
+        const R theta = std::acos(direction.y);
+        R phi = std::atan(direction.z / direction.x) + ((direction.x > 0) ? 2.0 * M_PI : M_PI);
+		phi += 0;
+		phi = std::fmod(phi,2.0 * M_PI);
 
         const int i = (int)((theta * M_1_PI) * height) % height;
         const int j = (int)((phi * (0.5 * M_1_PI)) * width) % width;
