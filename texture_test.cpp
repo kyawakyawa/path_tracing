@@ -4,7 +4,6 @@
 #include "Scene.h"
 #include "Mesh.h"
 #include "glout.h"
-#include "BVH.h"
 
 int main(int argc, char **argv){
 
@@ -16,7 +15,8 @@ int main(int argc, char **argv){
 	//Mesh mesh(argv[1],10.0,Vec3(70,50,50),Vec3(0.0,1,0.0),0);//miku
 	//Mesh mesh(argv[1],5.0,Vec3(0,0,0),Vec3(0.0,1,0.0),0);//woman
 	Mesh mesh(argv[1],30,Vec3(70,20,50),Vec3(0,1.0,0),0);//lps
-	//Mesh mesh(argv[1],1,Vec3(70,15,50),Vec3(0,1.0,0),3.14*4/7.0);//miku
+	//Mesh mesh(argv[1],1,Vec3(70,15,50),Vec3(0,1.0,0),3.14*7.0/4.0,Ms_SMOOTH);//miku
+	//Mesh mesh(argv[1],5,Vec3(70,15,50),Vec3(0,1.0,0),3.14*0/4.0,Ms_SMOOTH);//animasa_miku
 
 
 	Vec3 MAX = Vec3(mesh.bvh.nodes[1].aabb_max[0],
@@ -65,7 +65,7 @@ int main(int argc, char **argv){
 	Scene scene(Camera(600,600,Vec3(20,22.0,102.0) + 32 * Vec3(1.0,0.07,-1.09),Vec3(1.0,0.09,-1.09),Vec3(0.0,1.0,0.0),30.0));//lps miku
 
 	scene.add(new Mesh(mesh));
-	scene.draw(10,10);
+	scene.draw(1,10);
 	//scene.normal_render();
 	//drawgl(argc,argv,scene);
 	

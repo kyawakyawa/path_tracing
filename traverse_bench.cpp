@@ -10,7 +10,6 @@
 #include "Scene.h"
 #include "Mesh.h"
 #include "glout.h"
-#include "BVH.h"
 
 int main(int argc, char **argv){
 	R a = 0.85;

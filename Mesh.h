@@ -8,7 +8,7 @@
 
 #include "Vec3.h"
 #include "Shape.h"
-#include "BVH.h"
+#include "Simple_bvh.h"
 #include "Polygon.h"
 #include "Polygon_info.h"
 
