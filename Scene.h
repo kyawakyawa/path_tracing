@@ -220,6 +220,38 @@ struct Scene{
 		compute(sample,0,supersamples);
 	}
 
+	void normal_render(){
+		init_img();
+		printf("P3\n%d %d\n255\n", WIDTH,HEIGHT);
+		#pragma omp parallel for schedule(dynamic, 1) num_threads(8)
+		for(int i = 0;i < HEIGHT;i++){
+			for(int j = 0;j < WIDTH;j++){
+				const Ray ray = camera.get_ray(i,j);
+				Intersection_info *intersection_info = get_intersection_of_nearest(ray);
+				if(intersection_info == nullptr){
+					img[i * WIDTH + j] = FColor(0,0,0);
+					continue;
+				}
+				const Vec3 &normal = intersection_info->intersection_point->normal;
+				img[i * WIDTH + j] = FColor((normal.x + 1.0) * 0.5,(normal.y + 1.0) * 0.5,(normal.z + 1.0) * 0.5);
+				delete intersection_info;
+			}
+		}
+		for(int i = 0 ;i < WIDTH * HEIGHT;i++){
+			R r = img[i].red;
+        	R g = img[i].green;
+        	R b = img[i].blue;
+        	r = std::max((R)0.0,r);r = std::min((R)1.0,r);
+        	g = std::max((R)0.0,g);g = std::min((R)1.0,g);
+        	b = std::max((R)0.0,b);b = std::min((R)1.0,b);
+        	int ir = r * 255 + 0.5;
+        	int ig = g * 255 + 0.5;
+        	int ib = b * 255 + 0.5;
+
+        	printf("%d %d %d\n",ir,ig,ib);
+		}
+	}
+
 	~Scene(){
 		for(Shape *shape : shapes)
 			delete shape;

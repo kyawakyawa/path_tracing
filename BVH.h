@@ -318,7 +318,7 @@ struct BVH {
 		return nullptr;
 
 		/*
-		const Vec3 &normal = polygon.normal;//(cross(polygon.vertex[1] - polygon.vertex[0],polygon.vertex[2] - polygon.vertex[1])).normalized();
+		const Vec3 &normal = polygon.face_normal;//(cross(polygon.vertex[1] - polygon.vertex[0],polygon.vertex[2] - polygon.vertex[1])).normalized();
 		const Vec3 &d = ray.direction;
 		Vec3 s2;
 
