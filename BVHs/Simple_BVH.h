@@ -3,12 +3,10 @@
 #include <vector>
 #include <algorithm>
 
-#include "tiny_obj_loader.h"
-
-#include "Vec3.h"
-#include "Node_Simple_bvh.h"
-#include "Polygon.h"
-#include "Polygon_info.h"
+#include "../Vec3.h"
+#include "Node_Simple_BVH.h"
+#include "../Polygon.h"
+#include "../Polygon_info.h"
 
 //typedef std::vector< Vec3 > Polygon;
 
