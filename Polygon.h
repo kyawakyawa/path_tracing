@@ -14,4 +14,16 @@ struct Polygon {
     int mtl_id = 0;
     int texture_id = -1;
     Polygon() = default;
+    Polygon(const Polygon &obj){
+        vertex = obj.vertex;
+        uv = obj.uv;
+        vertex_normal = obj.vertex_normal;
+        face_normal = obj.face_normal;
+        for(int i = 0;i < 3;i++){
+            aabb_max[i] = obj.aabb_max[i];
+            aabb_min[i] = obj.aabb_min[i];
+        }
+        mtl_id = obj.mtl_id;
+        texture_id = obj.texture_id;
+    }
 };

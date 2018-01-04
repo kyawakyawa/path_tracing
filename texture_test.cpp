@@ -19,12 +19,13 @@ int main(int argc, char **argv){
 	//Mesh mesh(argv[1],5,Vec3(70,15,50),Vec3(0,1.0,0),3.14*0/4.0,Ms_SMOOTH);//animasa_miku
 
 
-	Vec3 MAX = Vec3(mesh.bvh.nodes[1].aabb_max[0],
-				mesh.bvh.nodes[1].aabb_max[1],
-				mesh.bvh.nodes[1].aabb_max[2]);
-	Vec3 MIN = Vec3(mesh.bvh.nodes[1].aabb_min[0],
-				mesh.bvh.nodes[1].aabb_min[1],
-				mesh.bvh.nodes[1].aabb_min[2]);
+	int root = mesh.bvh.root;
+	Vec3 MAX = Vec3(mesh.bvh.nodes[root].aabb_max[0],
+				mesh.bvh.nodes[root].aabb_max[1],
+				mesh.bvh.nodes[root].aabb_max[2]);
+	Vec3 MIN = Vec3(mesh.bvh.nodes[root].aabb_min[0],
+				mesh.bvh.nodes[root].aabb_min[1],
+				mesh.bvh.nodes[root].aabb_min[2]);
 	Vec3 d = MAX - MIN;
 	Vec3 c = d * 0.5 + MIN;
 	Vec3 ss[101][101];
@@ -65,8 +66,8 @@ int main(int argc, char **argv){
 	Scene scene(Camera(600,600,Vec3(20,22.0,102.0) + 32 * Vec3(1.0,0.07,-1.09),Vec3(1.0,0.09,-1.09),Vec3(0.0,1.0,0.0),30.0));//lps miku
 
 	scene.add(new Mesh(mesh));
-	scene.draw(1,10);
-	//scene.normal_render();
+	//scene.draw(1,10);
+	scene.normal_render();
 	//drawgl(argc,argv,scene);
 	
 	return 0;

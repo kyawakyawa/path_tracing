@@ -32,7 +32,7 @@ struct CompZ{
 struct BVH {
 
 	std::vector< Node_BVH > nodes;
-	int root = 0;
+	int root = 1;
 
 	BVH() = default;
 	//BVH(std::vector< Material > &ms): materials(ms){};

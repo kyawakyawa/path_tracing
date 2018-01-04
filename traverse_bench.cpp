@@ -22,12 +22,13 @@ int main(int argc, char **argv){
 
 	Mesh mesh(argv[1],100.0,Vec3(0,0,0),Vec3(1,1,1),0);
 
-	Vec3 MAX = Vec3(mesh.bvh.nodes[1].aabb_max[0],
-				mesh.bvh.nodes[1].aabb_max[1],
-				mesh.bvh.nodes[1].aabb_max[2]);
-	Vec3 MIN = Vec3(mesh.bvh.nodes[1].aabb_min[0],
-				mesh.bvh.nodes[1].aabb_min[1],
-				mesh.bvh.nodes[1].aabb_min[2]);
+	int root = mesh.bvh.root;
+	Vec3 MAX = Vec3(mesh.bvh.nodes[root].aabb_max[0],
+				mesh.bvh.nodes[root].aabb_max[1],
+				mesh.bvh.nodes[root].aabb_max[2]);
+	Vec3 MIN = Vec3(mesh.bvh.nodes[root].aabb_min[0],
+				mesh.bvh.nodes[root].aabb_min[1],
+				mesh.bvh.nodes[root].aabb_min[2]);
 	Vec3 d = MAX - MIN;
 	Vec3 c = d * 0.5 + MIN;
 	Vec3 ss[101][101];
