@@ -88,6 +88,7 @@ int main(int argc, char **argv){
 	std::cout << "direction" << std::setprecision(10) << ds[ii][jj].normalized() << std::endl;
 	
 	if(nullptr != inter)std::cout << std::setprecision(10) << inter->position << std::endl;
+	if(nullptr != inter)std::cout << std::setprecision(10) << inter->distance << std::endl;
 	delete inter;
 
 	return 0;
