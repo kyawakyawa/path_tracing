@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include<chrono>
 
 #define TINYOBJLOADER_IMPLEMENTATION 
 //#define TINYOBJLOADER_USE_DOUBLE
@@ -8,7 +9,7 @@
 
 #include "Vec3.h"
 #include "Shape.h"
-#include "BVHs/Nonrecursive_BVH.h"
+#include "BVHs/Threaded_BVH.h"
 #include "Polygon.h"
 #include "Polygon_info.h"
 
@@ -128,7 +129,14 @@ struct Mesh : public Shape{
 			}
 		}
 
+	    std::cerr << "START BVH CONSTRUCTION  " << std::endl;
+		std::chrono::system_clock::time_point start,end;
+    	start = std::chrono::system_clock::now();
 		bvh.construction(polygons);
+		end = std::chrono::system_clock::now();
+
+	    auto elapsed = std::chrono::duration_cast< std::chrono::milliseconds >(end - start).count();
+	    std::cerr << "FINISH BVH CONSTRUCTION  " << elapsed <<"ms"<< std::endl;
 		/*for(const auto &polygon : polygons){
 		  	for(const auto &v : polygon){
 		  		std::cout << v << " ";

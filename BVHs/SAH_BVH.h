@@ -30,6 +30,11 @@ struct CompZ{
 	}
 } compZ;
 
+int BVH_count = 0;
+int BVH_count_traverse = 0;
+int BVH_count_polygon_intersection = 0;
+unsigned long long BVH_time_polygon_intersection = 0;
+
 struct BVH {
 
 	std::vector< Node_BVH > nodes;
@@ -43,7 +48,7 @@ struct BVH {
 		while(polygons.size() > n){
 			n *= 2;
 		}
-		nodes.resize(n * 2 + 100);
+		//nodes.resize(n * 2 + 100);
 		root = construction(polygons,polygons.begin(),polygons.end());
 		node_sort();
 	}
@@ -276,7 +281,7 @@ struct BVH {
 		}
 	}
 
-	static inline Polygon_info* polygon_intersection(const Ray &ray,const Polygon &polygon,const int index) {
+	static inline Polygon_info* polygon_intersection(const Ray &ray,const Polygon &polygon,const int index) ;/*{
 		const Vec3 &r = ray.direction;
 		const int n = polygon.vertex.size() - 2;
 		for(int i = 0;i < n;i++){
@@ -300,7 +305,7 @@ struct BVH {
 		}
 		return nullptr;
 	
-	}
+	}*/
 
 	void out() const{
 		for(auto &node : nodes){
@@ -312,3 +317,5 @@ struct BVH {
 		printf("\n");
 	}
 };
+
+#include "polygon_intersection.h"

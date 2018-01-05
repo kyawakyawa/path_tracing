@@ -67,8 +67,9 @@ int main(int argc, char **argv){
 	for(int ccc = 0 ;ccc < 100;ccc++){
 	std::chrono::system_clock::time_point start,end;
     start = std::chrono::system_clock::now();
-	for(int i = 0;i < 101;i++){
-		for(int j = 0;j < 101;j++){
+	for(int i = 0;i < 100;i++){
+		#pragma omp parallel for schedule(dynamic, 1) num_threads(4)
+		for(int j = 0;j < 100;j++){
 			delete mesh.get_intersection(Ray(ss[i][j],ds[i][j]));
 		}
 	}
@@ -90,6 +91,11 @@ int main(int argc, char **argv){
 	if(nullptr != inter)std::cout << std::setprecision(10) << inter->position << std::endl;
 	if(nullptr != inter)std::cout << std::setprecision(10) << inter->distance << std::endl;
 	delete inter;
+
+
+	std::cout << "polygon intersection   " << (R)BVH_count_polygon_intersection / BVH_count << std::endl;
+	std::cout << "polygon intersection time   " << (R)BVH_time_polygon_intersection / BVH_count << " ns" << std::endl;
+	std::cout << "traverse   " << (R)BVH_count_traverse / BVH_count << std::endl;
 
 	return 0;
 }

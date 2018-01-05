@@ -14,7 +14,7 @@ struct Polygon {
     int mtl_id = 0;
     int texture_id = -1;
     Polygon() = default;
-    Polygon(const Polygon &obj){
+    /*Polygon(const Polygon &obj){
         vertex = obj.vertex;
         uv = obj.uv;
         vertex_normal = obj.vertex_normal;
@@ -25,5 +25,5 @@ struct Polygon {
         }
         mtl_id = obj.mtl_id;
         texture_id = obj.texture_id;
-    }
+    }*/
 };
