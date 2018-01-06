@@ -14,3 +14,7 @@ fast_clang_texture:
 	clang++ -std=c++17 -Ofast -fopenmp -march=core-avx2 -lglut -lGLU -lGL -lm -o /tmp/texture_test texture_test.cpp  -ltcmalloc -ltbb
 Obj:
 	clang++ -std=c++17 -Ofast -fopenmp -march=core-avx2 -lglut -lGLU -lGL -lm -o /tmp/obj_test obj.cpp  -ltcmalloc 
+geom_test:
+	clang++ -std=c++17 -Ofast -fopenmp -march=core-avx2 -lglut -lGLU -lGL -lm -o /tmp/geom_test ./geom_test.cpp -ltbb
+geom_bench:
+	clang++ -std=c++17 -Ofast -fopenmp -march=core-avx2 -lglut -lGLU -lGL -lm -o /tmp/geom_bench ./geom_bench.cpp -ltbb -ltcmalloc -lprofiler

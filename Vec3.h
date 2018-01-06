@@ -95,7 +95,8 @@ inline constexpr Vec3 cross(const Vec3 &v1,const Vec3 &v2){
 		(v1.x * v2.y) - (v1.y * v2.x));
 }
 
-inline Vec3 rotate(const Vec3 &p,const Vec3 &r,const R theta){
+inline Vec3 rotate(const Vec3 &p,const Vec3 &rin,const R theta){
+	const Vec3 r = rin.normalized();
 	const R s = std::sin(theta * 0.5),c = std::cos(theta * 0.5);
 
 	const R w1 = c;

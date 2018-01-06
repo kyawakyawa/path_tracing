@@ -69,6 +69,10 @@ int main(int argc, char **argv){
 	//scene.draw(1,10);
 	scene.normal_render();
 	//drawgl(argc,argv,scene);
+
+	std::cerr<< "polygon intersection   " << (R)BVH_count_polygon_intersection / BVH_count << std::endl;
+	std::cerr << "polygon intersection time   " << (R)BVH_time_polygon_intersection / BVH_count << " ns" << std::endl;
+	std::cerr << "traverse   " << (R)BVH_count_traverse / BVH_count << std::endl;
 	
 	return 0;
 }
