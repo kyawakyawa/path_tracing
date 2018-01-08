@@ -77,7 +77,7 @@ struct Mesh : public Shape{
 			for(int i = 0;i < at.vertices.size() / 3 ;i++){
 				normals.push_back(Vec3(0,0,0));
 			}
-			int q = 0;
+			int q = 0;bool is_warning = true;
 			for(int i = 0;i < shs.size();i++){
 				int n = shs[i].mesh.num_face_vertices.size();
 				int p = 0;
@@ -85,6 +85,14 @@ struct Mesh : public Shape{
 					auto &nfv = shs[i].mesh.num_face_vertices[j];
 					Polygon &poly = polygons[q++];
 					for(int k = 0;k < nfv;k++){
+                        if(std::isnan(poly.face_normal.abs())){
+                            if(is_warning){
+                                std::cerr << "Warning! ポリゴンが潰れていて法線が正しく計算できませんでした。" << std::endl;
+                                is_warning = false;
+                            }
+							p++;
+                            continue;
+                        }
 						normals[shs[i].mesh.indices[p].vertex_index] += poly.face_normal;
 						p++;
 					}

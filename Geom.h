@@ -1,8 +1,11 @@
 #pragma once
 
 #include <chrono>
+#include <math.h>
+#include<iomanip>
 
 #define TINYOBJLOADER_IMPLEMENTATION 
+//#define TINYOBJLOADER_USE_DOUBLE
 #include "tiny_obj_loader.h"
 
 #include "Vec3.h"
@@ -78,7 +81,7 @@ struct Geom : public Shape {
 
         prims = new Prim[prims_num];
         
-        int p = 0;
+        int p = 0;bool is_warning = true;
         for(const auto &sh : shs){
             int q = 0;
             for(int i = 0;i < sh.mesh.num_face_vertices.size();i++) {
@@ -101,6 +104,13 @@ struct Geom : public Shape {
                             if(j == 1 && (k == 0 || k == 1)){
                                 continue;//だぶらないように
                             }
+                            if(std::isnan(normal.abs())){
+                                if(is_warning){
+                                    std::cerr << "Warning! ポリゴンが潰れていて法線が正しく計算できませんでした。" << std::endl;
+                                    is_warning = false;
+                                }
+                                continue;
+                            }
                             normals[prim.normals_index[k]] += normal;
                         }
                     }
@@ -118,7 +128,8 @@ struct Geom : public Shape {
         }
 
 		if(mtls.begin() == mtls.end()){
-			materials.push_back(Material(FColor(240.0 / 255,210.0 / 255,37.0 / 255),MT_PERFECT_REF));
+			//materials.push_back(Material(FColor(240.0 / 255,210.0 / 255,37.0 / 255),MT_PERFECT_REF));
+			materials.push_back(Material(FColor(0.75,0.75,0.75)));
 		}else{
 			for(auto &mtl : mtls){
 				materials.push_back(Material(FColor(mtl.diffuse[0],mtl.diffuse[1],mtl.diffuse[1])));
@@ -144,7 +155,7 @@ struct Geom : public Shape {
 	    end = std::chrono::system_clock::now();
 
         auto elapsed = std::chrono::duration_cast< std::chrono::milliseconds >(end - start).count();
-        std::cout <<"BVH construction  " << elapsed <<"ms"<< std::endl;
+        std::cerr <<"BVH construction  " << elapsed <<"ms"<< std::endl;
     }
 
     inline Intersection_point* get_intersection(const Ray &ray) const {
@@ -161,8 +172,9 @@ struct Geom : public Shape {
 		}
         return ret;*/
         int index = bvh.traverse(ray,vertices,prims);
-        if(index > -1)
+        if(index > -1){
             return polygon_intersection(ray,prims[index]);
+        }
         return nullptr;
     }
 
@@ -188,9 +200,10 @@ struct Geom : public Shape {
 		const R v = Q * r * inv;
 		if(t > EPS && u > 0 && v > 0 && u + v < 1.0){
 			const Vec3 intersection = ray.start + t * r;
-			R a = cross(vertex[1] - intersection,vertex[2] - intersection).abs();
-			R b = cross(E2,intersection - vertex[0]).abs();
-			R c = cross(E1,intersection - vertex[0]).abs();
+			const R a = cross(vertex[1] - intersection,vertex[2] - intersection).abs();
+			const R b = cross(E2,intersection - vertex[0]).abs();
+			const R c = cross(E1,intersection - vertex[0]).abs();
+
 			const Vec3 ret_normal = (a * normal[0] + b * normal[1] + c * normal[2]).normalized();
 			//const Vec3 ret_normal = (cross(vertex[1] - vertex[0],vertex[2] - vertex[1])).normalized();
 			if(prim.texture_id >= 0){

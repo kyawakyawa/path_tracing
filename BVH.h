@@ -51,7 +51,7 @@ unsigned long long BVH_time_polygon_intersection = 0;
 struct BVH {
 
 	std::vector< Node_BVH > nodes;
-	Link *links[6];
+	Link *links[6];// 0 +X 1 -X 2 +Y 3 -Y 4 +Z 5 -Z
 	int links_num = 0;
 	BVH_Prim *bvh_prims = nullptr;
 	int bvh_prims_num = 0;
@@ -93,16 +93,13 @@ struct BVH {
 				bvh_prims[i].aabb[1][2] = std::min(bvh_prims[i].aabb[1][2],vertices[prims[i].vertices_index[j]].z);
 			}
 
-			for(int j = 0;j < 3;j++){
-				bvh_prims[i].aabb[2][j] = (bvh_prims[i].aabb[0][j] + bvh_prims[i].aabb[1][j]) * 0.5;
-				//std::cerr << bvh_prims[i].aabb[2][j] << "  ";
-			}
-			//std::cerr << "\n" << std::endl;
+			//for(int j = 0;j < 3;j++){
+				//bvh_prims[i].aabb[2][j] = (bvh_prims[i].aabb[0][j] + bvh_prims[i].aabb[1][j]) * 0.5;
+			//}
 		}
 	}
 
 	int construction(const int left,const int right){
-		//std::cerr << left << " " << right << std::endl;
 		int n = right - left;
 
 		Node_BVH node;
@@ -193,7 +190,7 @@ struct BVH {
 			A_S2[n - i - 1] = aabb_S(aabb2.aabb);
 		}
 
-		const R Taabb = 2.0;const R Ttri = 1.0;const R A_S_inv = 1.0 / A_S;
+		const R Taabb = 1.0;const R Ttri = 7.0;const R A_S_inv = 1.0 / A_S;
 		R mini = 2 * Taabb + A_S1[0] * A_S_inv * (1) * Ttri + A_S2[0] * A_S_inv * (n) * Ttri; 
 		int mini_i = 0;
 		for(int i = 1;i < n;i++){
@@ -257,9 +254,12 @@ struct BVH {
 		Link &link = links[axis][now];
 		link.aabb_index = now;
 		link.polygon_index = node.polygon_index;
+		const bool f = is_exchange(node.children[0],node.children[1],axis);
+		const int left = f ? node.children[1] : node.children[0];
+		const int right = f ? node.children[0] : node.children[1];
 
 		if(node.polygon_index == -1){
-			link.hit = node.children[0];
+			link.hit = left;
 		}else{
 			link.hit = nearest_right;
 		}
@@ -267,8 +267,30 @@ struct BVH {
 
 		if(node.polygon_index > -1)
 			return;
-		make_link(axis,node.children[0],node.children[1]);
-		make_link(axis,node.children[1],nearest_right);
+		make_link(axis,left,right);
+		make_link(axis,right,nearest_right);
+	}
+
+	inline bool is_exchange(const int l,const int r,const int axis){
+		if(l < 0 || r < 0)
+			return false;
+		const Node_BVH &left = nodes[l];
+		const Node_BVH &right = nodes[r];
+
+		switch (axis){
+			case 0:
+				return left.aabb[0][0] < right.aabb[0][0];
+			case 1:
+				return left.aabb[1][0] > right.aabb[1][0];
+			case 2:
+				return left.aabb[0][1] < right.aabb[0][1];
+			case 3:
+				return left.aabb[1][1] > right.aabb[1][1];
+			case 4:
+				return left.aabb[0][2] < right.aabb[0][2];
+				break;
+		}
+		return left.aabb[1][2] > right.aabb[1][2];
 	}
 
 	void set_aabbs(){
@@ -283,16 +305,28 @@ struct BVH {
 	}
 
 	int traverse(const Ray &ray,const Vec3 *vertices,const Prim *prims) const {
-		R start[3];start[0] = ray.start.x;start[1] = ray.start.y;start[2] = ray.start.z;
-		R direction[3];direction[0] = 1.0 / ray.direction.x;direction[1] = 1.0 / ray.direction.y;direction[2] = 1.0 / ray.direction.z;
+		//R start[3];start[0] = ray.start.x;start[1] = ray.start.y;start[2] = ray.start.z;
+		const R start[3] = { ray.start.x , ray.start.y , ray.start.z};
+		//R direction[3];direction[0] = 1.0 / ray.direction.x;direction[1] = 1.0 / ray.direction.y;direction[2] = 1.0 / ray.direction.z;
+		const R direction[3] = {1.0f / ray.direction.x , 1.0f / ray.direction.y , 1.0f / ray.direction.z};
 		R min_d = 1000000000000.0;
 		int ret = -1;
 
-		BVH_count++;
+		//BVH_count++;
 
 		int now = root;
 
-		Link *links = this->links[0];
+		int axis = 0;;
+		const R dir[3] = {ray.direction.x , ray.direction.y , ray.direction.z };
+		for(int i = 1;i < 3;i++){
+			if(std::abs(dir[axis]) < std::abs(dir[i]))
+				axis = i;
+		}
+		axis *= 2;
+		if(dir[axis >> 1] > 0.0)
+			axis++;
+
+		const Link *links = this->links[axis];
 
 		while(now != -1){
 			const Link link = links[now];
@@ -365,33 +399,6 @@ struct BVH {
 		}
 		return -1000000000.0;
 	}
-
-	//static inline Polygon_info* polygon_intersection(const Ray &ray,const Polygon &polygon,const int index);
-	/*static inline Polygon_info* polygon_intersection(const Ray &ray,const Polygon &polygon,const int index) {
-		const Vec3 &r = ray.direction;
-		const int n = polygon.vertex.size() - 2;
-		for(int i = 0;i < n;i++){
-			const Vec3 T = ray.start - polygon.vertex[0];
-			const Vec3 E1 = polygon.vertex[i + 1] - polygon.vertex[0];
-			const Vec3 E2 = polygon.vertex[i + 2] - polygon.vertex[0];
-			const Vec3 P = cross(r,E2);
-			const Vec3 Q = cross(T,E1);
-
-			const R bunbo = P * E1;
-			if(bunbo < EPS * EPS && bunbo > -EPS * EPS)
-				return nullptr;
-			const R inv = 1.0 / bunbo;
-
-			const R t = Q * E2 * inv;
-			const R u = P * T * inv;
-			const R v = Q * r * inv;
-			if(t > EPS && u > 0 && v > 0 && u + v < 1.0){
-				return new Polygon_info(t,index);
-			}
-		}
-		return nullptr;
-	
-	}*/
 
 	~BVH(){
 		for(int i = 0;i < 6;i++){

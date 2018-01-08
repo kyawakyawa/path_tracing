@@ -2,6 +2,7 @@
 
 #include<climits>
 #include <vector>
+#include <chrono>
 #include "Shape.h"
 #include "Intersection_info.h"
 #include "Camera.h"
@@ -223,8 +224,11 @@ struct Scene{
 	void normal_render(){
 		init_img();
 		printf("P3\n%d %d\n255\n", WIDTH,HEIGHT);
-		#pragma omp parallel for schedule(dynamic, 1) num_threads(8)
+	    std::chrono::system_clock::time_point start,end;
+        start = std::chrono::system_clock::now();
 		for(int i = 0;i < HEIGHT;i++){
+			//std::cerr << i << std::endl;
+			#pragma omp parallel for schedule(dynamic, 1) num_threads(8)
 			for(int j = 0;j < WIDTH;j++){
 				const Ray ray = camera.get_ray(i,j);
 				Intersection_info *intersection_info = get_intersection_of_nearest(ray);
@@ -237,6 +241,10 @@ struct Scene{
 				delete intersection_info;
 			}
 		}
+	    end = std::chrono::system_clock::now();
+
+        auto elapsed = std::chrono::duration_cast< std::chrono::nanoseconds >(end - start).count();
+        std::cerr <<"rays " << ((R)(WIDTH * HEIGHT) / (elapsed * 1e-9)) * 10e-6 << " M ray / s" << std::endl;
 		for(int i = 0 ;i < WIDTH * HEIGHT;i++){
 			R r = img[i].red;
         	R g = img[i].green;
@@ -252,6 +260,46 @@ struct Scene{
 		}
 	}
 
+	void neraiuti(int n,int y,int x,int Y,int X){
+		init_img();
+		printf("P3\n%d %d\n255\n", X - x,Y - y);
+		//#pragma omp parallel for schedule(dynamic, 1) num_threads(8)
+		for(int i = y;i < Y;i++){
+			for(int j = x;j < X;j++){
+				const Ray ray = camera.get_ray(i,j);
+				Intersection_info *intersection_info = get_intersection_of_nearest(ray);
+				if(intersection_info == nullptr){
+					img[i * WIDTH + j] = FColor(0,0,0);
+					continue;
+				}
+				const Vec3 &normal = intersection_info->intersection_point->normal;
+				//std::cerr << normal << std::endl;
+				img[i * WIDTH + j] = FColor((normal.x + 1.0) * 0.5,(normal.y + 1.0) * 0.5,(normal.z + 1.0) * 0.5);
+				delete intersection_info;
+				/*const Ray ray = camera.get_ray(i,j);
+				for(int k = 0;k < n;k++){
+					img[i * WIDTH + j] += pathtracing(ray,0);
+				}
+				img[i * WIDTH + j] *= (1.0 / n);*/
+			}
+		}
+		for(int i = y;i < Y;i++){
+			for(int j = x;j < X;j++){
+				R r = img[i * WIDTH + j].red;
+	        	R g = img[i * WIDTH + j].green;
+	        	R b = img[i * WIDTH + j].blue;
+	        	r = std::max((R)0.0,r);r = std::min((R)1.0,r);
+	        	g = std::max((R)0.0,g);g = std::min((R)1.0,g);
+	        	b = std::max((R)0.0,b);b = std::min((R)1.0,b);
+	        	int ir = r * 255 + 0.5;
+	        	int ig = g * 255 + 0.5;
+	        	int ib = b * 255 + 0.5;
+
+	        	printf("%d %d %d\n",ir,ig,ib);
+	
+			}
+		}
+	}
 	~Scene(){
 		for(Shape *shape : shapes)
 			delete shape;

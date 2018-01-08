@@ -43,7 +43,7 @@ struct Link{
 
 struct BVH_Prim {
 	int index;
-	R aabb[3][3];//0 max 1 min 2 cen
+	R aabb[2][3];//0 max 1 min 2 cen
 	BVH_Prim() {
 		for(int i = 0;i < 3;i++){
 			aabb[0][i] = -1000000000000.0f;

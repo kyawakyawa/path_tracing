@@ -65,7 +65,8 @@ int main(int argc, char **argv){
 	for(int i = 0;i < 100;i++){
 		#pragma omp parallel for schedule(dynamic, 1) num_threads(4)
 		for(int j = 0;j < 100;j++){
-			delete geom.get_intersection(Ray(ss[i][j],ds[i][j]));
+			//delete geom.get_intersection(Ray(ss[i][j],ds[i][j]));
+			geom.bvh.traverse(Ray(ss[i][j],ds[i][j]),geom.vertices,geom.prims);
 		}
 	}
 	end = std::chrono::system_clock::now();

@@ -79,7 +79,7 @@ struct Vec3{
 			return x * x + y * y + z * z;
 		}
 		inline Vec3 normalized() const {//正規化（ベクトルの長さを1にする)ベクトル
-			R l = 1.0 / std::sqrt(x * x + y * y + z * z);//逆数であることを明示した方が早い？
+			const R l = 1.0 / std::sqrt(x * x + y * y + z * z);//逆数であることを明示した方が早い？
 			return { x * l,y * l , z * l};
 		}
 };
