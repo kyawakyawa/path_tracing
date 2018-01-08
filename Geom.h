@@ -14,7 +14,7 @@
 #include "BVH.h"
 
 enum Geom_shading_type {
-    Gm_Default,//通常
+    Gm_STRICT,//通常
     Gm_SMOOTH//頂点法線を平均化して滑らかにする
 };
 
@@ -34,7 +34,11 @@ struct Geom : public Shape {
     BVH bvh;
 
     Geom() = delete;
-    inline Geom(const std::string inputfile,const R magni,const Vec3 slide,const Vec3 r,R theta) : type(Gm_SMOOTH){
+    inline Geom(const std::string inputfile,const R magni,const Vec3 slide,const Vec3 r,R theta) : type(Gm_STRICT){
+        load_and_precompute(inputfile,magni,slide,r,theta);
+    }
+
+    inline Geom(const std::string inputfile,const R magni,const Vec3 slide,const Vec3 r,R theta,const Geom_shading_type t) : type(t){
         load_and_precompute(inputfile,magni,slide,r,theta);
     }
 
@@ -55,23 +59,6 @@ struct Geom : public Shape {
 			exit(1);
 		}
 
-        if(type == Gm_SMOOTH){
-            vertices = new Vec3[vertices_num = at.vertices.size() / 3];
-            normals = new Vec3[normals_num = at.vertices.size() / 3];
-            for(int i = 0;i < at.vertices.size() / 3;i++){
-                vertices[i] = rotate(Vec3(at.vertices[i * 3],at.vertices[i * 3 + 1],at.vertices[i * 3 + 2]),r,theta) * magni + slide;
-                normals[i] = Vec3(0,0,0);
-            }
-        }else{
-            ;//normalを適切な数に
-        }
-
-        uvs = new Vec3[uvs_num = at.texcoords.size() / 2 + 1]; 
-        uvs[0] = Vec3(0.0,0.0,0.0);
-        for(int i = 0;i < at.texcoords.size() / 2;i++){
-            uvs[i] = Vec3(at.texcoords[i * 2],at.texcoords[i * 2 + 1],0.0); 
-        }
-
         prims_num = 0;
         for(const auto &sh : shs){
             for(const auto num : sh.mesh.num_face_vertices){
@@ -80,6 +67,27 @@ struct Geom : public Shape {
         }
 
         prims = new Prim[prims_num];
+
+        if(type == Gm_SMOOTH){
+            vertices = new Vec3[vertices_num = at.vertices.size() / 3];
+            normals = new Vec3[normals_num = at.vertices.size() / 3];
+            for(int i = 0;i < at.vertices.size() / 3;i++){
+                vertices[i] = rotate(Vec3(at.vertices[i * 3],at.vertices[i * 3 + 1],at.vertices[i * 3 + 2]),r,theta) * magni + slide;
+                normals[i] = Vec3(0,0,0);
+            }
+        }else if(type == Gm_STRICT){
+            vertices = new Vec3[vertices_num = at.vertices.size() / 3];
+            for(int i = 0;i < at.vertices.size() / 3;i++){
+                vertices[i] = rotate(Vec3(at.vertices[i * 3],at.vertices[i * 3 + 1],at.vertices[i * 3 + 2]),r,theta) * magni + slide;
+            }
+            normals = new Vec3[normals_num = prims_num];
+        }
+
+        uvs = new Vec3[uvs_num = at.texcoords.size() / 2 + 1]; 
+        uvs[0] = Vec3(0.0,0.0,0.0);
+        for(int i = 0;i < at.texcoords.size() / 2;i++){
+            uvs[i] = Vec3(at.texcoords[i * 2],at.texcoords[i * 2 + 1],0.0); 
+        }
         
         int p = 0;bool is_warning = true;
         for(const auto &sh : shs){
@@ -112,6 +120,11 @@ struct Geom : public Shape {
                                 continue;
                             }
                             normals[prim.normals_index[k]] += normal;
+                        }
+                    }else if(type == Gm_STRICT){
+                        normals[p] = (cross(vertices[prim.vertices_index[1]] - vertices[prim.vertices_index[0]],vertices[prim.vertices_index[2]] - vertices[prim.vertices_index[1]])).normalized();
+                        for(int k = 0;k < 3;k++){
+                            prim.normals_index[k] = p;
                         }
                     }
                     if(sh.mesh.material_ids[i] >= 0) prim.mtl_id = sh.mesh.material_ids[i];

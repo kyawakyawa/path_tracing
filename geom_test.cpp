@@ -21,7 +21,7 @@ int main(int argc, char **argv){
 
 	Scene scene(Camera(600,600,Vec3(20,22.0,102.0) + 32 * Vec3(1.0,0.07,-1.09),Vec3(1.0,0.09,-1.09),Vec3(0.0,1.0,0.0),30.0));//lps miku
 
-	scene.add(new Geom(argv[1],30,Vec3(70,20,50),Vec3(0,1.0,0),0));
+	scene.add(new Geom(argv[1],30,Vec3(70,20,50),Vec3(0,1.0,0),0,Gm_SMOOTH));
 	//scene.draw(1,10);
 	//scene.normal_render();
 	drawgl(argc,argv,scene);

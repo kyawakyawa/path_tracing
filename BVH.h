@@ -312,7 +312,7 @@ struct BVH {
 		R min_d = 1000000000000.0;
 		int ret = -1;
 
-		//BVH_count++;
+		BVH_count++;
 
 		int now = root;
 
