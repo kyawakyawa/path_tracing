@@ -25,8 +25,8 @@ struct Camera{
     const Vec3 center;
 
     Camera() = delete;
-    Camera(int w,int h): picW(w),picH(h),width(30.0 * w / h),height(30.0),x(cross(dir,up).normalized() * width),y(cross(dir,x).normalized() * height),center(dir * dist) {};
-    Camera(int w,int h,Vec3 p,Vec3 d,Vec3 u,R ds): position(p),dir(d.normalized()),up(u.normalized()),picW(w),picH(h),width(30.0 * w / h),height(30.0),dist(ds),x(cross(dir,up).normalized() * width),y(cross(dir,x).normalized() * height),center(dir * dist){};
+    Camera(int w,int h): picW(w),picH(h),width(30.0),height(30.0 * h / w),x(cross(dir,up).normalized() * width),y(cross(dir,x).normalized() * height),center(dir * dist) {};
+    Camera(int w,int h,Vec3 p,Vec3 d,Vec3 u,R ds): position(p),dir(d.normalized()),up(u.normalized()),picW(w),picH(h),width(30.0),height(30.0 * h / w),dist(ds),x(cross(dir,up).normalized() * width),y(cross(dir,x).normalized() * height),center(dir * dist){};
 
     Ray get_ray(int i,int j) const {
         return Ray(position,center + ((R)j / picW - 0.5) * x + ((R)i / picH - 0.5) * y);

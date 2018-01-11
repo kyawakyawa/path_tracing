@@ -5,3 +5,7 @@ tiny_obj_loader.h
 obj
 stb_image.h
 hdr
+toml.h
+test.toml
+old_toml_test.cpp
+models

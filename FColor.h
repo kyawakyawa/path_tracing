@@ -73,3 +73,14 @@ struct FColor{
 inline constexpr FColor operator *(const R s,const FColor& v){//スカラー*ベクトル
 	return {s * v.red,s * v.green,s * v.blue};
 }
+
+template <class Char> // 出力ストリーム
+inline std::basic_ostream<Char>& operator <<(std::basic_ostream<Char>& os, const FColor& v){
+    return os << Char('(') << v.red << Char(',') <<v.green << Char(',') << v.blue << Char(')');
+}
+
+template <class Char> // 入力ストリーム (x,y,z) と入力する
+inline std::basic_istream<Char>& operator >>(std::basic_istream<Char>& is, FColor& v){
+    Char unused;
+    return is >> unused >> v.red >> unused >> v.green >> unused >> v.blue >> unused;
+}

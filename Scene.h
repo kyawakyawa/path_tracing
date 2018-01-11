@@ -30,19 +30,22 @@ struct Scene{
 	const R INF = 1000000000.0;
 	//const FColor back;//物体がないときの色
 	const Infinity_light_source back;
-	const int MAX_DEPTH = 4;//再帰の深さの最大値
+	const int MIN_DEPTH = 4;//再帰の深さの最小値(オブジェクトに当たらなかった時は別)
+	const int MAX_DEPTH = 32;//再帰の深さの最大値
+	const int threads = 4; //スレッドの数
 	FColor *img;//ピクセルごとの色を保持
 	const Camera camera;
 
 	inline Scene(): back(/*FColor(100.0 / 255,149.0 / 255,237.0 / 255)*/"hdr/PaperMill_E_3k.hdr"),img(new FColor[HEIGHT * WIDTH]),camera(480,480){}
 	inline Scene(int w,int h) :HEIGHT(h),WIDTH(w),back(/*FColor(100.0 / 255,149.0 / 255,237.0 / 255)*/"hdr/PaperMill_E_3k.hdr"),img(new FColor[HEIGHT * WIDTH]),camera(WIDTH,HEIGHT){};
 	inline Scene(Camera c) :HEIGHT(c.picH),WIDTH(c.picW),back(/*FColor(100.0 / 255,149.0 / 255,237.0 / 255)*/"hdr/PaperMill_E_3k.hdr"),img(new FColor[HEIGHT * WIDTH]),camera(c){};
+	inline Scene(Camera c,int min_depth,int max_depth,int th,std::string ibl,const FColor &cl) :HEIGHT(c.picH),WIDTH(c.picW),back(/*FColor(100.0 / 255,149.0 / 255,237.0 / 255)*/ibl,cl),MIN_DEPTH(min_depth),MAX_DEPTH(max_depth),threads(th),img(new FColor[HEIGHT * WIDTH]),camera(c){};
 	inline void add(Shape *shape){//物体を追加する
 		shapes.push_back(shape);
 	}
 
 	inline void init_img(){
-		#pragma omp parallel for schedule(dynamic, 1) num_threads(8)
+		#pragma omp parallel for schedule(dynamic, 1) num_threads(threads)
 		for(int i = 0;i < HEIGHT * WIDTH;i++)
 			img[i] = FColor(0,0,0);
 	}
@@ -96,10 +99,10 @@ struct Scene{
 
 		R P = std::max(std::max(material.kd.red,material.kd.green),material.kd.blue);
 
-		if(depth < MAX_DEPTH)
+		if(depth < MIN_DEPTH)
 			P = 1.0;
 		
-		if (depth > 32)
+		if (depth >= MAX_DEPTH)//最大値で大幅に確率を下げる
 			P *= pow(0.5, depth - 32);
 		
 		
@@ -173,7 +176,7 @@ struct Scene{
 	void compute(int n,int N){//サンプル回数とすでに何回サンプリングしているか
 		if(N == 0)
 			init_img();
-		#pragma omp parallel for schedule(dynamic, 1) num_threads(8)
+		#pragma omp parallel for schedule(dynamic, 1) num_threads(threads)
 		for(int i = 0;i < HEIGHT;i++){
 			for(int j = 0;j < WIDTH;j++){
 				//const Ray ray(Vec3(0,0,-5),Vec3(2.0 * j / (WIDTH - 1) - 1,-2.0 * i / (HEIGHT - 1) + 1,5.0));
@@ -191,7 +194,7 @@ struct Scene{
 		if(N == 0)
 			init_img();
 		const R r = 1.0 / (n * supersamples * supersamples + N);
-		#pragma omp parallel for schedule(dynamic, 1) num_threads(8)
+		#pragma omp parallel for schedule(dynamic, 1) num_threads(threads)
 		for(int i = 0;i < HEIGHT;i++){
 			for(int j = 0;j < WIDTH;j++){
 				img[i * WIDTH + j] *= N;
@@ -228,7 +231,7 @@ struct Scene{
         start = std::chrono::system_clock::now();
 		for(int i = 0;i < HEIGHT;i++){
 			//std::cerr << i << std::endl;
-			#pragma omp parallel for schedule(dynamic, 1) num_threads(8)
+			#pragma omp parallel for schedule(dynamic, 1) num_threads(threads)
 			for(int j = 0;j < WIDTH;j++){
 				const Ray ray = camera.get_ray(i,j);
 				Intersection_info *intersection_info = get_intersection_of_nearest(ray);
@@ -263,7 +266,7 @@ struct Scene{
 	void neraiuti(int n,int y,int x,int Y,int X){
 		init_img();
 		printf("P3\n%d %d\n255\n", X - x,Y - y);
-		//#pragma omp parallel for schedule(dynamic, 1) num_threads(8)
+		//#pragma omp parallel for schedule(dynamic, 1) num_threads(threads)
 		for(int i = y;i < Y;i++){
 			for(int j = x;j < X;j++){
 				const Ray ray = camera.get_ray(i,j);

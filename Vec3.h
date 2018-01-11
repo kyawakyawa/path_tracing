@@ -51,8 +51,8 @@ struct Vec3{
 		}
 		inline Vec3& operator -=(const Vec3& obj){
 			x -= obj.x;
-			y += obj.y;
-			z += obj.z;
+			y -= obj.y;
+			z -= obj.z;
 			return *this;
 		}
 		inline Vec3& operator *=(const R a){

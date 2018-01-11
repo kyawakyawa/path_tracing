@@ -18,3 +18,9 @@ geom_test:
 	clang++ -std=c++17 -O3 -fopenmp -march=core-avx2 -lglut -lGLU -lGL -lm -o /tmp/geom_test ./geom_test.cpp -ltbb -ltcmalloc
 geom_bench:
 	clang++ -std=c++17 -O0 -fopenmp -march=core-avx2 -lglut -lGLU -lGL -lm -o /tmp/geom_bench ./geom_bench.cpp -ltbb -ltcmalloc -lprofiler
+like_edupt:
+	clang++ -std=c++17 -O3 -fopenmp -march=core-avx2 -lglut -lGLU -lGL -lm -o /tmp/sample ./sample.cpp -ltbb -ltcmalloc
+toml_test:
+	clang++ -std=c++17 -O3 -fopenmp -march=core-avx2 -lglut -lGLU -lGL -lm -o /tmp/toml_test toml_test.cpp -ltbb -ltcmalloc -g
+load_toml:
+	clang++ -std=c++17 -O3 -fopenmp -march=core-avx2 -lglut -lGLU -lGL -lm -o /tmp/load_toml load_toml.cpp -ltbb -ltcmalloc -g

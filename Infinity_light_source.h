@@ -17,14 +17,15 @@ struct Infinity_light_source{
         //light.push_back(FColor(100.0 / 255,149.0 / 255,237.0 / 255));
         light.push_back(FColor(0.75,0.75,0.75));
     }
-    Infinity_light_source(std::string filename){
+    Infinity_light_source(const std::string filename):Infinity_light_source(filename,FColor(0.75,0.75,0.75)){};
+    Infinity_light_source(const std::string filename,const FColor &cl){
         int n;
         float *pixel = stbi_loadf(filename.c_str(), &width, &height, &n, 0);
 		if(pixel == nullptr){
 			width = 1;
 			height = 1;
         	//light.push_back(FColor(100.0 / 255,149.0 / 255,237.0 / 255));
-            light.push_back(FColor(0.75,0.75,0.75));
+            light.push_back(cl);
 			return;
 		}
 

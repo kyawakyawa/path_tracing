@@ -4,7 +4,7 @@
 #include "glout.h"
 
 int main(int argc, char **argv){
-    Scene scene(100,100);
+    Scene scene(400,400);
     
 	R a = 0.75;
 	
