@@ -44,11 +44,11 @@ struct Geom : public Shape {
         load_and_precompute(inputfile,magni,slide,r,theta);
     }
 
-    inline Geom(const std::string inputfile,const std::vector<Scene_data::Transform> transforms,const Material &material,const Geom_shading_type t) : type(t){
+    inline Geom(const std::string inputfile,const std::vector<Scene_data::Transform> transforms,const Material *material,const Geom_shading_type t) : type(t){
         load_and_precompute(inputfile,transforms,material);
     }
 
-    inline void load_and_precompute(const std::string inputfile,const std::vector<Scene_data::Transform> transforms,const Material &material) {
+    inline void load_and_precompute(const std::string inputfile,const std::vector<Scene_data::Transform> transforms,const Material *material) {
 
 		tinyobj::attrib_t at;
 		std::vector<tinyobj::shape_t> shs;
@@ -159,7 +159,7 @@ struct Geom : public Shape {
                             prim.normals_index[k] = p;
                         }
                     }
-                    if(sh.mesh.material_ids[i] >= 0) prim.mtl_id = sh.mesh.material_ids[i];
+                    if(material == nullptr && sh.mesh.material_ids[i] >= 0) prim.mtl_id = sh.mesh.material_ids[i];
                     p++;
                 }
                 q += nfv;
@@ -172,9 +172,11 @@ struct Geom : public Shape {
             }
         }
 
-		if(mtls.begin() == mtls.end()){
+        if(material != nullptr){
+            materials.push_back(*material);
+        }else if(mtls.begin() == mtls.end()){
 			//materials.push_back(Material(FColor(240.0 / 255,210.0 / 255,37.0 / 255),MT_PERFECT_REF));
-			materials.push_back(material);
+			materials.push_back(FColor(0.75,0.75,0.75));
 		}else{
 			for(auto &mtl : mtls){
 				materials.push_back(Material(FColor(mtl.diffuse[0],mtl.diffuse[1],mtl.diffuse[2])));

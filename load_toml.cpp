@@ -104,7 +104,8 @@ int main(int argc, char **argv){
 			if(me.type == Scene_data::OBJ) {
 				if(ma.type == Scene_data::LAMBERT) {
 					Geom_shading_type st = (me.normal == "smooth") ? Gm_SMOOTH : Gm_STRICT;
-					scene.add(new Geom(me.path,obj.transform,Material(ma.albedo,lig.emission),st));
+					Material material(ma.albedo,lig.emission);
+					scene.add(new Geom(me.path,obj.transform,&material,st));
 				}
 			}
 		}
@@ -112,20 +113,29 @@ int main(int argc, char **argv){
 
 	int p = 0;
 	for(const auto &obj : root.object) {
-		if(used_obj[p])
+		if(used_obj[p]){
 			continue;
+		}
 
+		bool is_mesh_exist= false;
 		Scene_data::Mesh me;
 		for(const auto &m : root.mesh){
 			if(obj.mesh == m.name) {
 				me = m;
+				is_mesh_exist = true;
 				break;
 			}
 		}
+		if(!is_mesh_exist){
+			continue;
+		}
+
+		bool is_material_exist = false;
 		Scene_data::Material ma;
 		for(const auto &m : root.material) {
 			if(obj.material == m.name) {
 				ma = m;
+				is_material_exist = true;
 				break;
 			}
 		}
@@ -146,14 +156,26 @@ int main(int argc, char **argv){
 				}
 			}
 
-			if(ma.type == Scene_data::LAMBERT) {
-				scene.add(new Sphere(cen,me.radius,Material(ma.albedo,ma.emission)));
+			if(!is_material_exist) {
+				scene.add(new Sphere(cen,me.radius,Material(FColor(1.0,0.0,0.0))));
+			}else if(ma.type == Scene_data::LAMBERT) {
+				scene.add(new Sphere(cen,me.radius,Material(ma.albedo)));
+			}else if(ma.type == Scene_data::PHONG) {
+				scene.add(new Sphere(cen,me.radius,Material(ma.reflectance,ma.alpha,MT_NORMALIZED_PHONG)));
 			}
 		}
 		if(me.type == Scene_data::OBJ) {
-			if(ma.type == Scene_data::LAMBERT) {
+			if(!is_material_exist) {
 				Geom_shading_type st = (me.normal == "smooth") ? Gm_SMOOTH : Gm_STRICT;
-				scene.add(new Geom(me.path,obj.transform,Material(ma.albedo,ma.emission),st));
+				scene.add(new Geom(me.path,obj.transform,nullptr,st));
+			}else if(ma.type == Scene_data::LAMBERT) {
+				Geom_shading_type st = (me.normal == "smooth") ? Gm_SMOOTH : Gm_STRICT;
+				Material material(ma.albedo);
+				scene.add(new Geom(me.path,obj.transform,&material,st));
+			}else if(ma.type == Scene_data::PHONG) {
+				Geom_shading_type st = (me.normal == "smooth") ? Gm_SMOOTH : Gm_STRICT;
+				Material material(ma.reflectance,ma.alpha,MT_NORMALIZED_PHONG);
+				scene.add(new Geom(me.path,obj.transform,&material,st));
 			}
 		}
 		p++;

@@ -95,7 +95,7 @@ struct Scene{
 		const Material material = intersection->material;//intersection_shape->get_material(intersection->position);
 		const Vec3 normal = ((ray.direction * intersection->normal < 0.0) ? 1.0 : -1.0) * intersection->normal;
 		
-		FColor L = material.Le;
+		FColor L = (ray.direction * intersection->normal < 0.0) ? material.Le : FColor(0,0,0);
 
 		R P = std::max(std::max(material.kd.red,material.kd.green),material.kd.blue);
 
@@ -167,6 +167,27 @@ struct Scene{
 				L += material.kd * (pathtracing(Ray(p,r),depth + 1) * Fr + pathtracing(Ray(p,T),depth + 1) * Tr) * (1.0 / P);
 			}
 		} break;
+		case MT_NORMALIZED_PHONG: {
+			Vec3 u;
+			if (std::abs(normal.x) > 1e-6) // ベクトルwと直交するベクトルを作る。w.xが0に近い場合とそうでない場合とで使うベクトルを変える。
+				u = (cross(Vec3(0.0, 1.0, 0.0), normal)).normalized();
+			else
+				u = (cross(Vec3(1.0, 0.0, 0.0), normal)).normalized();
+			const Vec3 v = cross(normal,u);
+
+			const R u1 = rando() * 2.0 * 3.1415926535,t = std::pow(rando(),1.0 / (2 + material.n));//alpha = 5
+			const R t2 = std::sqrt(1.0 - t * t);
+
+			const Vec3 omega = 
+				u * std::cos(u1) * t2 +
+				v * std::sin(u1) * t2 +
+				normal * t;
+
+			const R nome = normal * omega;
+			const R f = (omega - 2 * nome * normal) * ray.direction / nome;
+
+			L += material.kd * std::pow(f,material.n) * pathtracing(Ray(intersection->position /*+ epsilon * omega*/,omega),depth + 1) * (1.0 / P);
+		}
 		}
 
 		delete intersection_info;

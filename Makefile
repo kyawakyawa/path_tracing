@@ -23,4 +23,4 @@ like_edupt:
 toml_test:
 	clang++ -std=c++17 -O3 -fopenmp -march=core-avx2 -lglut -lGLU -lGL -lm -o /tmp/toml_test toml_test.cpp -ltbb -ltcmalloc -g
 load_toml:
-	clang++ -std=c++17 -O3 -fopenmp -march=core-avx2 -lglut -lGLU -lGL -lm -o /tmp/load_toml load_toml.cpp -ltbb -ltcmalloc -g
+	clang++ -std=c++17 -O3 -fopenmp -march=core-avx2 -lglut -lGLU -lGL -lm -o /tmp/load_toml load_toml.cpp -ltbb -ltcmalloc 

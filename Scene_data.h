@@ -240,7 +240,9 @@ namespace Scene_data{
 	struct Material {
 		Material_type type = LAMBERT;
 		std::string name = "";
-		FColor albedo = FColor(0,0,0);
+		FColor albedo = FColor(0.0,0.0,0.0);
+		FColor reflectance = FColor(0,0,0);
+		float alpha = 1;
 		FColor emission = FColor(0,0,0);
 		Material() = default;
 		Material(const toml::Value& material) {
@@ -299,9 +301,35 @@ namespace Scene_data{
 					emission = FColor(ve[0],ve[1],ve[2]);
 				}
 				//delete vec_e;
+				type = LAMBERT;
 			}
 			if(ty->as<std::string>() == "phong"){
-
+				const toml::Value* vec_r = material.find("reflectance");
+				if(vec_r != nullptr && vec_r->is<toml::Array>()){
+					float ve[3] = {0.0 , 0.0 , 0.0};int p = 0;
+					for(const auto &v : vec_r->as<toml::Array>()) {
+						if(p >= 3) {
+							break;
+						}
+						if(v.is<double>()) {
+							ve[p] = v.as<double>();
+						}
+						if(v.is<int>()) {
+							ve[p] = v.as<int>();
+						}
+						p++;
+					}
+					reflectance = FColor(ve[0],ve[1],ve[2]);
+				}
+				const toml::Value* al = material.find("alpha");
+				if(al != nullptr && al->is<double>()) {
+					alpha = al->as<double>();
+				}
+				if(al != nullptr && al->is<int>()) {
+					alpha = al->as<int>();
+				}
+				//delete vec_r;
+				type = PHONG;
 			}
 			//delete ty;
 		}
@@ -825,6 +853,8 @@ namespace Scene_data{
 				std::cout << ma.name<< std::endl;
 				std::cout << ma.type << std::endl;
 				std::cout << ma.albedo<< std::endl;
+				std::cout << ma.reflectance << std::endl;
+				std::cout << ma.alpha << std::endl;
 				std::cout << ma.emission << std::endl;
 			}
 			std::cout << "\n\n" << std::endl;

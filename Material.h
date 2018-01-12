@@ -5,7 +5,8 @@
 enum Material_type{
     MT_DEFAULT,//通常
     MT_PERFECT_REF,//完全鏡面反射
-    MT_REFRACTION//屈折
+    MT_REFRACTION,//屈折
+    MT_NORMALIZED_PHONG//正規化Phong
 };
 
 struct Material{
@@ -20,4 +21,5 @@ struct Material{
     inline Material(const FColor &d,Material_type t): kd(d),type(t){};
     inline Material(const FColor &d,R _n): kd(d),type(MT_REFRACTION),n(_n){};
     inline Material(const FColor &d,const FColor &e): kd(d),type(MT_DEFAULT),Le(e){};
+    inline Material(const FColor &d,const R _n,Material_type t): kd(d),n(_n),type(t){};
 };
