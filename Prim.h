@@ -9,5 +9,7 @@ struct Prim {
 
     int mtl_id = 0;
     int texture_id = -1;
+
+    R S = 0;
     Prim() = default;
 };

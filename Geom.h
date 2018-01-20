@@ -32,6 +32,7 @@ struct Geom : public Shape {
 
     Prim *prims = nullptr;
     int prims_num;
+    R S = 0.0;
 
     BVH bvh;
 
@@ -196,6 +197,12 @@ struct Geom : public Shape {
 			}
 		}
 
+        S = 0;
+        for(int i = 0;i < prims_num;i++) {
+            prims[i].S = cross(vertices[prims[i].vertices_index[2]] - vertices[prims[i].vertices_index[0]],vertices[prims[i].vertices_index[1]] - vertices[prims[i].vertices_index[0]]).abs() * 0.5;
+            S += prims[i].S;
+        }
+
 	    std::chrono::system_clock::time_point start,end;
         start = std::chrono::system_clock::now();
         bvh.construction(vertices,prims,prims_num);
@@ -325,6 +332,12 @@ struct Geom : public Shape {
 			}
 		}
 
+        S = 0;
+        for(int i = 0;i < prims_num;i++) {
+            prims[i].S = cross(vertices[prims[i].vertices_index[2]] - vertices[prims[i].vertices_index[0]],vertices[prims[i].vertices_index[1]] - vertices[prims[i].vertices_index[0]]).abs() * 0.5;
+            S += prims[i].S;
+        }
+
 	    std::chrono::system_clock::time_point start,end;
         start = std::chrono::system_clock::now();
         bvh.construction(vertices,prims,prims_num);
@@ -388,6 +401,42 @@ struct Geom : public Shape {
 			return new Intersection_point(t,intersection,ret_normal,materials[prim.mtl_id]);
 		}
 		return nullptr;
+	}
+
+    inline R get_S() const {
+        return S;
+    }
+
+	inline void sample_one_point (Vec3 &point,Vec3 &normal,R &pdf,FColor &emission) const {//http://zwxadz.hateblo.jp/entry/2016/06/08/020550  http://www.sciencedirect.com/science/article/pii/S0895717708002665
+        int prim_id = (int)(rando() * prims_num);
+        if(prim_id < 0)
+            prim_id = 0;
+        if(prim_id >= prims_num)
+            prim_id = prims_num - 1;
+        const Prim &prim = prims[prim_id];
+        const R u1 = rando();
+        const R u2 = rando();
+
+        const R M = (u1 > u2) ? u1 : u2;
+        const R m = (u1 < u2) ? u1 : u2;
+
+        point = vertices[prim.vertices_index[0]] * m
+                + vertices[prim.vertices_index[1]] * (1.0 - M)
+                + vertices[prim.vertices_index[2]] * (M - m);
+
+        normal = (cross(vertices[prim.vertices_index[1]] - vertices[prim.vertices_index[0]],vertices[prim.vertices_index[2]] - vertices[prim.vertices_index[1]])).normalized();
+
+		/*for(int i = 0;i < 3;i++){
+			if(((cross(vertices[prim.vertices_index[(i + 1) % 3]] - vertices[prim.vertices_index[i]],point - vertices[prim.vertices_index[(i + 1) % 3]])).normalized() * normal < EPS)){
+                std::cerr << "三角形の外" << std::endl;
+                std::cerr << point << std::endl;
+                std::cerr << vertices[prim.vertices_index[0]] << " " << vertices[prim.vertices_index[1]] << " " << vertices[prim.vertices_index[2]] << std::endl;
+                break;
+			}
+        }*/
+
+        pdf = 1.0 / (prims_num * prim.S);
+        emission = materials[0].Le;
 	}
 
     ~Geom() {

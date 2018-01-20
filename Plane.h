@@ -59,4 +59,15 @@ struct Plane: public Shape{
 		}
 		return materials[0];
 	}
+
+	inline R get_S() const {
+		return 0.0;
+	}
+
+	inline void sample_one_point (Vec3 &point,Vec3 &normal,R &pdf,FColor &emission) const {
+		point = Vec3(1000000000,1000000000,1000000000);
+		normal = this->normal;
+		pdf = 0;
+		emission = FColor(0,0,0);
+	}
 };

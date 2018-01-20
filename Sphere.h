@@ -1,6 +1,9 @@
 #pragma once
 
+#include<cmath>
+
 #include "Shape.h"
+#include "Random.h"
 
 struct Sphere : public Shape{
 	const Vec3 center;//中心の座標
@@ -33,6 +36,21 @@ struct Sphere : public Shape{
 		return new Intersection_point(t,ray.start + t * d,s + t * d,materials[0]);
 	}
 
+	inline R get_S() const {
+		return 4.0 * M_PI * radius * radius;
+	}
+
+	inline void sample_one_point (Vec3 &point,Vec3 &normal,R &pdf,FColor &emission) const { //http://tapioca.hatenablog.jp/entry/2017/02/19/015556
+		const R z = rando() * 2.0 - 1.0;
+		const R phi = rando() * 2.0 * M_PI;
+
+		const R w = std::sqrt(1.0 - z * z);
+		const Vec3 dir = Vec3(w * std::cos(phi),w * std::sin(phi),z);
+		point = center + radius * dir;
+		normal = dir;
+		pdf = 1.0 / get_S();
+		emission = materials[0].Le;
+	}
 	/*inline Material get_material(const Vec3 &position) const {
 		return material;
 	}*/

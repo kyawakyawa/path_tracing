@@ -9,6 +9,8 @@
 //#include "Mesh.h"
 #include "Scene_data.h"
 
+#include "glout.h"
+
 #include "toml.h"//https://github.com/mayah/tinytoml
 
 int main(int argc, char **argv){
@@ -98,14 +100,14 @@ int main(int argc, char **argv){
 				}
 
 				if(ma.type == Scene_data::LAMBERT) {
-					scene.add(new Sphere(cen,me.radius,Material(ma.albedo,lig.emission)));
+					scene.add_as_light(new Sphere(cen,me.radius,Material(ma.albedo,lig.emission)));
 				}
 			}
 			if(me.type == Scene_data::OBJ) {
 				if(ma.type == Scene_data::LAMBERT) {
 					Geom_shading_type st = (me.normal == "smooth") ? Gm_SMOOTH : Gm_STRICT;
 					Material material(ma.albedo,lig.emission);
-					scene.add(new Geom(me.path,obj.transform,&material,st));
+					scene.add_as_light(new Geom(me.path,obj.transform,&material,st));
 				}
 			}
 		}
@@ -181,6 +183,8 @@ int main(int argc, char **argv){
 		p++;
 	}
 	scene.draw(std::max(1,root.renderer.samples / 16),4);
+	//scene.debug(std::max(1,root.renderer.samples / 16),4);
+	//drawgl(argc,argv,scene);
 
 	return 0;
 }

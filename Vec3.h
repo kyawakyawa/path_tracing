@@ -2,7 +2,7 @@
 
 #include<iostream>
 #include<cmath>
-#define EPS (1.0 / 2000.0)
+#define EPS (1.0 / 512.0)
 #define EQ(a,b) (std::abs((a)-(b)) < EPS)//２つの実数が等しいか
 
 typedef float R;
@@ -68,7 +68,7 @@ struct Vec3{
 			return *this;
 		}
 
-		inline bool operator ==(const Vec3 &obj){
+		inline constexpr bool operator ==(const Vec3 &obj) const{
 			return EQ(this->x,obj.x) && EQ(this->y,obj.y) && EQ(this->z,obj.z);
 		}
 

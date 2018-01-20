@@ -68,6 +68,9 @@ struct FColor{
         blue *= r;
         return *this;
     }
+ 	inline R abs() const{//gccならconstexprにしても良い
+		return std::sqrt(red * red + green * green + blue * blue);
+	}
 };
 
 inline constexpr FColor operator *(const R s,const FColor& v){//スカラー*ベクトル
