@@ -18,7 +18,8 @@ int main(int argc, char **argv){
 	scene.add(new Sphere(Vec3(65,20,20),20,Material(FColor(0.25,a,0.25))));
 	scene.add(new Sphere(Vec3(27,16.5,47),16.5,Material(MT_PERFECT_REF)));
 	scene.add(new Sphere(Vec3(77,16.5,78),16.5,Material(MT_REFRACTION)));
-	scene.add(new Sphere(Vec3(50.0,90.0,81.6),15,Material(FColor(0.30,0.30,0.30),FColor(36,36,36))));
+	//scene.add(new Sphere(Vec3(50.0,90.0,81.6),15,Material(FColor(0.30,0.30,0.30),FColor(36,36,36))));
+	scene.add_as_light(new Sphere(Vec3(50.0, 73.0, 81.6), 5, Material(FColor(0.30, 0.30, 0.30), FColor(40, 30.901960, 22.431360))));
 
 	drawgl(argc,argv,scene);
 	//scene.draw(250,2);

@@ -367,6 +367,9 @@ namespace Scene_data{
 				if(fo != nullptr && fo->is<double>()){
 					fov = fo->as<double>();
 				}
+				if(fo != nullptr && fo->is<int>()){
+					fov = fo->as<int>();
+				}
 				//delete fo;
 				
 				const toml::Value* trans = camera.find("transform");

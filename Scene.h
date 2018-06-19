@@ -523,8 +523,8 @@ struct Scene{
 					for(int sx = 0;sx < supersamples;sx++){
 						const Ray ray = camera.get_ray(sy,sx,supersamples,i,j);
 						for(int k = 0;k < n;k++){
-							//img[i * WIDTH + j] += pathtracing_direct(ray,0,true);
-							img[i * WIDTH + j] += next_event_estimation(ray);
+							img[i * WIDTH + j] += pathtracing_direct(ray,0,true);
+							//img[i * WIDTH + j] += next_event_estimation(ray);
 							//img[i * WIDTH + j] += pathtracing(ray,0);
 						}
 					}
@@ -571,6 +571,7 @@ struct Scene{
 
         auto elapsed = std::chrono::duration_cast< std::chrono::nanoseconds >(end - start).count();
         std::cerr <<"rays " << ((R)(WIDTH * HEIGHT) / (elapsed * 1e-9)) * 10e-6 << " M ray / s" << std::endl;
+        std::cerr <<"rays " << elapsed << " nano seconds" << std::endl;
 		for(int i = 0 ;i < WIDTH * HEIGHT;i++){
 			R r = img[i].red;
         	R g = img[i].green;

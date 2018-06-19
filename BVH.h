@@ -312,7 +312,7 @@ struct BVH {
 		R min_d = 1000000000000.0;
 		int ret = -1;
 
-		BVH_count++;
+		//BVH_count++;
 
 		int now = root;
 
@@ -330,7 +330,7 @@ struct BVH {
 
 		while(now != -1){
 			const Link link = links[now];
-			BVH_count_traverse++;
+			//BVH_count_traverse++;
 
 			R t_max = 1000000000000.0;
 			R t_min = -1000000000000.0;
@@ -354,16 +354,16 @@ struct BVH {
 
 					int p_index = bvh_prims[link.polygon_index].index;
 
-					std::chrono::system_clock::time_point start,end;
-    				start = std::chrono::system_clock::now();
+					//std::chrono::system_clock::time_point start,end;
+    				//start = std::chrono::system_clock::now();
 
 					R distance = polygon_intersection(ray,vertices,prims[p_index]);
 
-					end = std::chrono::system_clock::now();
-					auto elapsed = std::chrono::duration_cast< std::chrono::nanoseconds >(end - start).count();
-					BVH_time_polygon_intersection += elapsed;
+					//end = std::chrono::system_clock::now();
+					//auto elapsed = std::chrono::duration_cast< std::chrono::nanoseconds >(end - start).count();
+					//BVH_time_polygon_intersection += elapsed;
 
-					BVH_count_polygon_intersection++;
+					//BVH_count_polygon_intersection++;
 
 					if(distance > -1 && (ret == -1 || distance < min_d)){
 						ret = p_index;

@@ -1,7 +1,7 @@
 build:
 	clang++ -std=c++17 -O3 -fopenmp -march=core-avx2 -lglut -lGLU -lGL -lm -o /tmp/traverse_bench traverse_bench.cpp  -ltcmalloc -lprofiler -g3 -DNDEBUG -fno-inline -ltbb
 fast_clang:
-	clang++ -std=c++17 -O3-fopenmp -march=core-avx2 -lglut -lGLU -lGL -lm -o /tmp/traverse_bench traverse_bench.cpp -ltcmalloc -lprofiler -g3 -DNDEBUG -ltbb
+	clang++ -std=c++17 -O3 -fopenmp -march=core-avx2 -lglut -lGLU -lGL -lm -o /tmp/traverse_bench traverse_bench.cpp -ltcmalloc -lprofiler -g3 -DNDEBUG -ltbb
 pgo:
 	g++ -std=c++17 -O3 -fopenmp -march=core-avx2 -lglut -lGLU -lGL -lm -o /tmp/traverse_bench traverse_bench.cpp  -ltcmalloc -lprofiler -g3 -DNDEBUG -fprofile-generate
 	/tmp/traverse_bench obj/buddha.obj
@@ -17,7 +17,7 @@ Obj:
 geom_test:
 	clang++ -std=c++17 -O3 -fopenmp -march=core-avx2 -lglut -lGLU -lGL -lm -o /tmp/geom_test ./geom_test.cpp -ltbb -ltcmalloc
 geom_bench:
-	clang++ -std=c++17 -O0 -fopenmp -march=core-avx2 -lglut -lGLU -lGL -lm -o /tmp/geom_bench ./geom_bench.cpp -ltbb -ltcmalloc -lprofiler
+	clang++ -std=c++17 -O3 -fopenmp -march=core-avx2 -lglut -lGLU -lGL -lm -o /tmp/geom_bench ./geom_bench.cpp -ltbb -ltcmalloc -lprofiler
 like_edupt:
 	clang++ -std=c++17 -O3 -fopenmp -march=core-avx2 -lglut -lGLU -lGL -lm -o /tmp/sample ./sample.cpp -ltbb -ltcmalloc
 toml_test:
