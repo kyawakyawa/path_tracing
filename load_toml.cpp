@@ -90,9 +90,10 @@ int main(int argc, char **argv){
 						cen += transform.vec3[0];
 					}
 					if(transform.type == Scene_data::SCALE) {
-						cen.x *= transform.vec3[0].x;
-						cen.y *= transform.vec3[0].y;
-						cen.z *= transform.vec3[0].z;
+                    	//cen.x *= transform.vec3[0].x;
+                    	//cen.y *= transform.vec3[0].y;
+                    	//cen.z *= transform.vec3[0].z;
+                    	me.radius *= transform.vec3[0].x;
 					}
 					if(transform.type == Scene_data::AXIS_ANGLE) {
 						cen = rotate(cen,transform.vec3[0],transform.f);
@@ -149,9 +150,10 @@ int main(int argc, char **argv){
                     cen += transform.vec3[0];
                 }
                 if(transform.type == Scene_data::SCALE) {
-                    cen.x *= transform.vec3[0].x;
-                    cen.y *= transform.vec3[0].y;
-                    cen.z *= transform.vec3[0].z;
+                    //cen.x *= transform.vec3[0].x;
+                    //cen.y *= transform.vec3[0].y;
+                    //cen.z *= transform.vec3[0].z;
+                    me.radius *= transform.vec3[0].x;
                 }
                 if(transform.type == Scene_data::AXIS_ANGLE) {
                     cen = rotate(cen,transform.vec3[0],transform.f);
@@ -182,9 +184,10 @@ int main(int argc, char **argv){
 		}
 		p++;
 	}
-	scene.draw(std::max(1,root.renderer.samples / 16),4);
+	//std::cerr << scene.shapes.size() << std::endl;
+	//scene.draw(std::max(1,root.renderer.samples / 16),4);
 	//scene.debug(std::max(1,root.renderer.samples / 16),4);
-	//drawgl(argc,argv,scene);
+	drawgl(argc,argv,scene);
 
 	return 0;
 }
