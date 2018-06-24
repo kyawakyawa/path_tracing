@@ -4,10 +4,14 @@
 #include "FColor.h"
 #include "Scene.h"
 #include "Sphere.h"
-//#include "Plane.h"
 #include "Geom.h"
-//#include "Mesh.h"
+#include "Radiance/Path_tracing.h"
+#include "Radiance/Path_tracing_direct.h"
+#include "Radiance/Path_tracing_direct_nonrecursive.h"
+#include "Radiance/Normal_render.h"
 #include "Scene_data.h"
+#include "Camera/Ideal_pin_hole.hpp"
+#include "Camera/Thin_lens.hpp"
 
 #include "glout.h"
 
@@ -32,7 +36,6 @@ int main(int argc, char **argv){
 
 
 	Scene_data::Root root(v);
-	//root.out();
 	
 	Vec3 pos,dir,up;
 	R dis = 15.0 / tan(root.camera.fov / 360.0 * M_PI);
@@ -50,7 +53,33 @@ int main(int argc, char **argv){
 	else
 		root.sky.color = FColor(0.75,0.75,0.75);
 
-	Scene scene(Camera(root.film.resolution[0],root.film.resolution[1],pos,dir,up,dis),root.renderer.depth,root.renderer.depth_limit,root.renderer.threads,root.sky.path,root.sky.color);
+	Radiance *radiance = nullptr;
+	if(root.renderer.integrator == "pt") {
+		radiance = new Path_tracing(root.renderer.depth,root.renderer.depth_limit,root.sky.path,root.sky.color);
+	}else if(root.renderer.integrator == "pt-direct") {
+		radiance = new Path_tracing_direct(root.renderer.depth,root.renderer.depth_limit,root.sky.path,root.sky.color);
+	}else if(root.renderer.integrator == "pt-direct-nonrecursive") {
+		radiance = new Path_tracing_direct_nonrecursive(root.renderer.depth,root.renderer.depth_limit,root.sky.path,root.sky.color);
+	}else {
+		radiance = new Normal_render();
+	}
+
+	Camera *camera = nullptr;
+
+	if(root.camera.type == Scene_data::IDEAL_PINHOLE) {
+		camera = new Ideal_pin_hole(root.film.resolution[0],root.film.resolution[1],pos,dir,up,root.camera.fov);
+	}else if(root.camera.type == Scene_data::THIN_LENS) {
+		camera = new Thin_lens(root.film.resolution[0],root.film.resolution[1],pos,dir,up,root.camera.fov,root.camera.focus_distance,root.camera.f_number);
+	}else {
+	}
+
+	//Scene scene(Camera(root.film.resolution[0],root.film.resolution[1],pos,dir,up,dis),radiance);
+	//Scene scene(new Ideal_pin_hole(root.film.resolution[0],root.film.resolution[1],pos,dir,up,root.camera.fov),radiance);
+	//Scene scene(new Thin_lens(root.film.resolution[0],root.film.resolution[1],pos,dir,up,39.3077,530,5.4),radiance);
+	Scene scene(camera,radiance);
+
+	radiance = nullptr;
+	camera = nullptr;
 
 	bool used_obj[root.object.size()];
 	std::fill(used_obj,used_obj + root.object.size(),false);
@@ -184,10 +213,14 @@ int main(int argc, char **argv){
 		}
 		p++;
 	}
+
+
+	scene.draw(root.renderer.samples);
 	//std::cerr << scene.shapes.size() << std::endl;
 	//scene.draw(std::max(1,root.renderer.samples / 16),4);
 	//scene.debug(std::max(1,root.renderer.samples / 16),4);
-	drawgl(argc,argv,scene);
+	//drawgl(argc,argv,scene);
+	std::cerr << maxy << std::endl;
 
 	return 0;
 }

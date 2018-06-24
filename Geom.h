@@ -408,14 +408,14 @@ struct Geom : public Shape {
     }
 
 	inline void sample_one_point (Vec3 &point,Vec3 &normal,R &pdf,FColor &emission) const {//http://zwxadz.hateblo.jp/entry/2016/06/08/020550  http://www.sciencedirect.com/science/article/pii/S0895717708002665
-        int prim_id = (int)(rando() * prims_num);
+        int prim_id = (int)(Random::rando() * prims_num);
         if(prim_id < 0)
             prim_id = 0;
         if(prim_id >= prims_num)
             prim_id = prims_num - 1;
         const Prim &prim = prims[prim_id];
-        const R u1 = rando();
-        const R u2 = rando();
+        const R u1 = Random::rando();
+        const R u2 = Random::rando();
 
         const R M = (u1 > u2) ? u1 : u2;
         const R m = (u1 < u2) ? u1 : u2;

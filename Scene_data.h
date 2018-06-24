@@ -342,7 +342,9 @@ namespace Scene_data{
 	};
 	struct Camera {
 		Camera_type type = IDEAL_PINHOLE;
-		float fov = 30;;
+		float fov = 30;
+		float focus_distance = 100;
+		float f_number = 1.8;
 		std::vector<Transform> transform;
 		Camera() {
 			//Transformのデフォルトを入力;
@@ -372,16 +374,50 @@ namespace Scene_data{
 				}
 				//delete fo;
 				
-				const toml::Value* trans = camera.find("transform");
+				/*const toml::Value* trans = camera.find("transform");
 				if(trans != nullptr && trans->is<toml::Array>()) {
 					transform.clear();
 					for(const auto &tran : trans->as<toml::Array>()) {
 						transform.push_back(Transform(tran));
 					}
-				}
+				}*/
 				type = IDEAL_PINHOLE;
 				//delete trans;
 				
+			}
+			if(ty->as<std::string>() == "thin-lens") {
+				const toml::Value* fo = camera.find("fov");
+				if(fo != nullptr && fo->is<double>()){
+					fov = fo->as<double>();
+				}
+				if(fo != nullptr && fo->is<int>()){
+					fov = fo->as<int>();
+				}
+
+				const toml::Value* focus_distanc = camera.find("focus_distance");
+				if(focus_distanc != nullptr && focus_distanc->is<double>()){
+					focus_distance = focus_distanc->as<double>();
+				}
+				if(focus_distanc != nullptr && focus_distanc->is<int>()){
+					focus_distance = focus_distanc->as<int>();
+				}
+
+				const toml::Value* f_numbe = camera.find("f_number");
+				if(f_numbe != nullptr && f_numbe->is<double>()) {
+					f_number = f_numbe->as<double>();
+				}
+				if(f_numbe != nullptr && f_numbe->is<int>()) {
+					f_number = f_numbe->as<int>();
+				}
+				type = THIN_LENS;
+			}
+
+			const toml::Value* trans = camera.find("transform");
+			if(trans != nullptr && trans->is<toml::Array>()) {
+				transform.clear();
+				for(const auto &tran : trans->as<toml::Array>()) {
+					transform.push_back(Transform(tran));
+				}
 			}
 			//delete ty;
 		}

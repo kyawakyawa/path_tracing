@@ -6,23 +6,19 @@
 
 Scene *glScene;
 void idle(){
-	static int N = 0;
-    int n = 1;
-    int super = 1;
-    glScene->compute(n,N,super);
-    N += (n * super * super);
-	printf("%d\n",N);
+    glScene->camera->sensitization(&glScene->shapes,&glScene->lights,1,4);
+	printf("%ld\n",glScene->camera->sample_num);
 	glutPostRedisplay();
 }
 
 void display(void){
     glClear(GL_COLOR_BUFFER_BIT);
     glBegin(GL_POINTS);
-    for(int i = 0;i < glScene->HEIGHT;i++){
-        for(int j = 0;j < glScene->WIDTH;j++){
-            R r = glScene->img[i * glScene->WIDTH + j].red;
-            R g = glScene->img[i * glScene->WIDTH + j].green;
-            R b = glScene->img[i * glScene->WIDTH + j].blue;
+    for(int i = 0;i < glScene->camera->pixel_h;i++){
+        for(int j = 0;j < glScene->camera->pixel_w;j++){
+            R r = glScene->camera->img[i * glScene->camera->pixel_w + j].red;
+            R g = glScene->camera->img[i * glScene->camera->pixel_w + j].green;
+            R b = glScene->camera->img[i * glScene->camera->pixel_w + j].blue;
             r = std::max((R)0.0,r);r = std::min((R)1.0,r);
             g = std::max((R)0.0,g);g = std::min((R)1.0,g);
             b = std::max((R)0.0,b);b = std::min((R)1.0,b);
@@ -30,7 +26,7 @@ void display(void){
             g = std::pow(g,1.0 / 2.2);
             b = std::pow(b,1.0 / 2.2);
             glColor3d(r,g,b);
-            glVertex2d(-1.0 + (float)j / (float)glScene->WIDTH * 2.0,1.0 - (float)i / (float)glScene->HEIGHT * 2.0);
+            glVertex2d(-1.0 + (float)j / (float)glScene->camera->pixel_w * 2.0,1.0 - (float)i / (float)glScene->camera->pixel_w * 2.0);
         }
     }
     glEnd();
@@ -41,7 +37,7 @@ void resize(int w, int h)
 {
     GLdouble size;
 
-    size = (GLdouble)glScene->WIDTH;
+    size = (GLdouble)glScene->camera->pixel_w;
     /* ウィンドウ全体をビューポートにする */
     glViewport(0, 0, w, h);
 
@@ -60,7 +56,7 @@ void init(void)
 void drawgl(int argc, char **argv,Scene scene) {
 	glScene = new Scene(scene);
 
-    glutInitWindowSize(glScene->WIDTH, glScene->HEIGHT);
+    glutInitWindowSize(glScene->camera->pixel_w, glScene->camera->pixel_h);
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGBA);
     glutCreateWindow(argv[0]);

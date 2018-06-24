@@ -16,7 +16,7 @@ struct Area_light_source : Light_source{//光源の抽象クラス
         return new Light_info(point,pdf,emission,normal);
     }
 	inline R get_weight() const {//光源の「重み」を取得 この光源がサンプルされる確率を計算
-        return S * object->materials[(int)(rando() * object->materials.size())].Le.abs();
+        return S * object->materials[(int)(Random::rando() * object->materials.size())].Le.abs();
     }
 
 	~Area_light_source() = default;

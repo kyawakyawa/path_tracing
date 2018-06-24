@@ -4,6 +4,7 @@
 #include<cmath>
 #define EPS (1.0 / 512.0)
 #define EQ(a,b) (std::abs((a)-(b)) < EPS)//２つの実数が等しいか
+#define INF (1e9)
 
 typedef float R;
 

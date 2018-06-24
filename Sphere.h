@@ -41,8 +41,8 @@ struct Sphere : public Shape{
 	}
 
 	inline void sample_one_point (Vec3 &point,Vec3 &normal,R &pdf,FColor &emission) const { //http://tapioca.hatenablog.jp/entry/2017/02/19/015556
-		const R z = rando() * 2.0 - 1.0;
-		const R phi = rando() * 2.0 * M_PI;
+		const R z = Random::rando() * 2.0 - 1.0;
+		const R phi = Random::rando() * 2.0 * M_PI;
 
 		const R w = std::sqrt(1.0 - z * z);
 		const Vec3 dir = Vec3(w * std::cos(phi),w * std::sin(phi),z);
