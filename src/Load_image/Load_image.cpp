@@ -1,7 +1,7 @@
-#include "Load_image.hpp"
+#include "../../inc/Load_image/Load_image.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
-#include "../ext_libs/stb_image.h"
+#include "../../inc/ext_libs/stb_image.h"
 
 Load_image::~Load_image() {
     delete[] img;

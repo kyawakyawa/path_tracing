@@ -1,21 +1,21 @@
 #include <cmath>
 #include <vector>
-#include "../Vec3/Vec3.hpp"
-#include "../Color/FColor.hpp"
-#include "../Scene/Scene.hpp"
-#include "../Shape/Sphere.hpp"
-#include "../Shape/Geom.hpp"
-#include "../Radiance/Path_tracing.hpp"
-#include "../Radiance/Path_tracing_direct.hpp"
-#include "../Radiance/Path_tracing_direct_nonrecursive.hpp"
-#include "../Radiance/Normal_render.hpp"
-#include "../Input_scene/Scene_data.hpp"
-#include "../Camera/Ideal_pin_hole.hpp"
-#include "../Camera/Thin_lens.hpp"
+#include "../../inc/Vec3/Vec3.hpp"
+#include "../../inc/Color/FColor.hpp"
+#include "../../inc/Scene/Scene.hpp"
+#include "../../inc/Shape/Sphere.hpp"
+#include "../../inc/Shape/Geom.hpp"
+#include "../../inc/Radiance/Path_tracing.hpp"
+#include "../../inc/Radiance/Path_tracing_direct.hpp"
+#include "../../inc/Radiance/Path_tracing_direct_nonrecursive.hpp"
+#include "../../inc/Radiance/Normal_render.hpp"
+#include "../../inc/Input_scene/Scene_data.hpp"
+#include "../../inc/Camera/Ideal_pin_hole.hpp"
+#include "../../inc/Camera/Thin_lens.hpp"
 
-#include "../GL_out/glout.h"
+#include "../../inc/GL_out/glout.hpp"
 
-#include "../ext_libs/toml.h"//https://github.com/mayah/tinytoml
+#include "../../inc/ext_libs/toml.h"//https://github.com/mayah/tinytoml
 
 int main(int argc, char **argv){
 
