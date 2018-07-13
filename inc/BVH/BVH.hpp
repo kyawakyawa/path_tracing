@@ -6,9 +6,9 @@
 #include <chrono>
 #include <tbb/parallel_sort.h>
 
-#include "../../Vec3/Vec3.hpp"
+#include "../Vec3/Vec3.hpp"
 #include "BVH_data_structures.hpp"
-#include "../Prim.hpp"
+#include "../Shape/Prim.hpp"
 
 
 

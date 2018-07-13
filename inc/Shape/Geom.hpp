@@ -11,7 +11,7 @@
 #include "../Vec3/Vec3.hpp"
 #include "Shape.hpp"
 #include "Prim.hpp"
-#include "BVH/BVH.hpp"
+#include "../BVH/BVH.hpp"
 
 #include "../Input_scene/Scene_data.hpp"
 

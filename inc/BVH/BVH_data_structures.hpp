@@ -2,7 +2,7 @@
 
 #include<vector>
 
-#include "../../Vec3/Vec3.hpp"
+#include "../Vec3/Vec3.hpp"
 
 struct Node_BVH {
 	int children[2];
