@@ -2,7 +2,7 @@
 
 #include "Camera.hpp"
 
-/*struct Ideal_pin_hole : Camera {
+struct Ideal_pin_hole : Camera {
     const R dist = 30;
 
     const R width = 1.0;//センサーの幅
@@ -12,26 +12,9 @@
 
     Ideal_pin_hole();
     Ideal_pin_hole(const int w,const int h);
-    Ideal_pin_hole(const int w,const int h,const Vec3 &p,const Vec3 &d,const Vec3 &u,const R f);
+    Ideal_pin_hole(const int w,const int h,const Vec3 &p,const Vec3 &d,const Vec3 &u,const R fov);
 
-    void sensitization(std::vector<Shape*> *shapes,std::vector<Light_source*> *lights,const int samples);
-
-    virtual ~Ideal_pin_hole();
-};*/
-
-struct Ideal_pin_hole : Camera {
-    const R dist = 30;
-
-    const R width = 1.0;//センサーの幅
-    const R height = 1.0;//センサーの高さ
-
-    const Vec3 x,y,center;
-
-    inline Ideal_pin_hole() : Ideal_pin_hole(480,480) {};
-    inline Ideal_pin_hole(const int w,const int h) : Ideal_pin_hole(w,h,Vec3(0,0,0),Vec3(0,0,-1),Vec3(0,1,0),40) {}; 
-    inline Ideal_pin_hole(const int w,const int h,const Vec3 &p,const Vec3 &d,const Vec3 &u,const R fov) : Camera(w,h,p,d,u),width(1.0),height(1.0 * h / w),dist(0.5 / std::tan(fov / 360.0 * M_PI)),x(cross(dir,up).normalized() * width),y(cross(dir,x).normalized() * height),center(dir.normalized() * dist){};
-
-    inline void sensitization(std::vector<Shape*> *shapes,std::vector<Light_source*> *lights,const int samples,const int threads) {
+    void sensitization(std::vector<Shape*> *shapes,std::vector<Light_source*> *lights,const int samples,const int threads);/* {
         if(radiance == nullptr) {
             std::cerr << "Not Found radiance" << std::endl;
             return;
@@ -55,8 +38,6 @@ struct Ideal_pin_hole : Camera {
         const R r = 1.0 / sample_num;
 
         for(int i = 0;i < pixel_h;i++) for(int j = 0;j < pixel_w;j++) img[i * pixel_w + j] *= r;
-    }
-    inline ~Ideal_pin_hole() {
-        delete[] img;
-    }
+    }*/
+    ~Ideal_pin_hole();
 };
