@@ -43,10 +43,10 @@ static bool compZ(BVH_Prim &a,BVH_Prim &b){
 	return a.aabb[0][2] < b.aabb[1][2];
 }
 
-int BVH_count = 0;
-int BVH_count_traverse = 0;
-int BVH_count_polygon_intersection = 0;
-unsigned long long BVH_time_polygon_intersection = 0;
+//int BVH_count = 0;
+//int BVH_count_traverse = 0;
+//int BVH_count_polygon_intersection = 0;
+//unsigned long long BVH_time_polygon_intersection = 0;
 
 struct BVH {
 

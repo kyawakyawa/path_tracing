@@ -12,7 +12,7 @@ namespace Scene_data{
 		SCALE,
 		AXIS_ANGLE,
 		LOOK_AT
-	} type;
+	};
 	struct Transform{
 		Transform_type  type = TRANSLATE;
 		Vec3 vec3[3] = { Vec3(0,0,0) , Vec3(0,0,0) ,Vec3(0,0,0) };
