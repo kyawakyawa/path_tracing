@@ -3,14 +3,11 @@
 #include <vector>
 #include <queue>
 #include <algorithm>
-#include <chrono>
 #include <tbb/parallel_sort.h>
 
 #include "../Vec3/Vec3.hpp"
 #include "BVH_data_structures.hpp"
 #include "../Shape/Prim.hpp"
-
-
 
 /*struct CompX{//インライン展開できるよう関数オブジェクトを使う
 	bool operator()(Polygon &a,Polygon &b){
@@ -42,11 +39,6 @@ static bool compZ(BVH_Prim &a,BVH_Prim &b){
 	//return a.aabb[2][2] < b.aabb[2][2];
 	return a.aabb[0][2] < b.aabb[1][2];
 }
-
-//int BVH_count = 0;
-//int BVH_count_traverse = 0;
-//int BVH_count_polygon_intersection = 0;
-//unsigned long long BVH_time_polygon_intersection = 0;
 
 struct BVH {
 
@@ -92,10 +84,6 @@ struct BVH {
 				bvh_prims[i].aabb[1][1] = std::min(bvh_prims[i].aabb[1][1],vertices[prims[i].vertices_index[j]].y);
 				bvh_prims[i].aabb[1][2] = std::min(bvh_prims[i].aabb[1][2],vertices[prims[i].vertices_index[j]].z);
 			}
-
-			//for(int j = 0;j < 3;j++){
-				//bvh_prims[i].aabb[2][j] = (bvh_prims[i].aabb[0][j] + bvh_prims[i].aabb[1][j]) * 0.5;
-			//}
 		}
 	}
 
@@ -132,29 +120,6 @@ struct BVH {
 			tbb::parallel_sort(bvh_prims + left,bvh_prims + right,compY);
 		else
 			tbb::parallel_sort(bvh_prims + left,bvh_prims + right,compZ);
-
-		/*int mini_i = 0;R mini_cost = 1000000000000.0;//costがnanになったらx方向にする
-		for(int i = 0;i < 3;i++){
-			if(i == 0)
-				tbb::parallel_sort(bvh_prims + left,bvh_prims + right,compX);
-			else if(i == 1)
-				tbb::parallel_sort(bvh_prims + left,bvh_prims + right,compY);
-			else
-				tbb::parallel_sort(bvh_prims + left,bvh_prims + right,compZ);
-			R cost;
-			divide_point(left,right,aabb_S(node.aabb),&cost);
-			if(mini_cost > cost){
-				mini_cost = cost;
-				mini_i = i;
-			}
-		}
-
-		if(mini_i == 0)
-			tbb::parallel_sort(bvh_prims + left,bvh_prims + right,compX);
-		else if(mini_i == 1)
-			tbb::parallel_sort(bvh_prims + left,bvh_prims + right,compY);
-		else
-			tbb::parallel_sort(bvh_prims + left,bvh_prims + right,compZ);*/
 
 		const int center = divide_point(left,right,aabb_S(node.aabb),nullptr);
 
@@ -305,14 +270,10 @@ struct BVH {
 	}
 
 	int traverse(const Ray &ray,const Vec3 *vertices,const Prim *prims) const {
-		//R start[3];start[0] = ray.start.x;start[1] = ray.start.y;start[2] = ray.start.z;
 		const R start[3] = { ray.start.x , ray.start.y , ray.start.z};
-		//R direction[3];direction[0] = 1.0 / ray.direction.x;direction[1] = 1.0 / ray.direction.y;direction[2] = 1.0 / ray.direction.z;
 		const R direction[3] = {1.0f / ray.direction.x , 1.0f / ray.direction.y , 1.0f / ray.direction.z};
 		R min_d = 1000000000000.0;
 		int ret = -1;
-
-		//BVH_count++;
 
 		int now = root;
 
@@ -330,7 +291,6 @@ struct BVH {
 
 		while(now != -1){
 			const Link link = links[now];
-			//BVH_count_traverse++;
 
 			R t_max = 1000000000000.0;
 			R t_min = -1000000000000.0;
@@ -354,16 +314,7 @@ struct BVH {
 
 					int p_index = bvh_prims[link.polygon_index].index;
 
-					//std::chrono::system_clock::time_point start,end;
-    				//start = std::chrono::system_clock::now();
-
 					R distance = polygon_intersection(ray,vertices,prims[p_index]);
-
-					//end = std::chrono::system_clock::now();
-					//auto elapsed = std::chrono::duration_cast< std::chrono::nanoseconds >(end - start).count();
-					//BVH_time_polygon_intersection += elapsed;
-
-					//BVH_count_polygon_intersection++;
 
 					if(distance > -1 && (ret == -1 || distance < min_d)){
 						ret = p_index;
@@ -465,5 +416,3 @@ struct BVH {
 		return *this;
 	}
 };
-
-//#include "polygon_intersection.h"

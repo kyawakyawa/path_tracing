@@ -51,7 +51,4 @@ struct Sphere : public Shape{
 		pdf = 1.0 / get_S();
 		emission = materials[0].Le;
 	}
-	/*inline Material get_material(const Vec3 &position) const {
-		return material;
-	}*/
 };

@@ -40,19 +40,7 @@ struct Geom : public Shape {
     void load_and_precompute(const std::string inputfile,const R magni,const Vec3 slide,Vec3 r,R theta);
 
     inline Intersection_point* get_intersection(const Ray &ray) const {
-		/*Intersection_point *ret = nullptr;
-	    R mint = 1000000000.0;
-
-		for(int i = 0;i < prims_num;i++){
-		    Intersection_point *p = polygon_intersection(ray,prims[i]);
-		    if(p != nullptr && p->distance < mint){
-		    	mint = p->distance;
-		    	delete ret;
-		    	ret = p;
-			}
-		}
-        return ret;*/
-        int index = bvh.traverse(ray,vertices,prims);
+       int index = bvh.traverse(ray,vertices,prims);
         if(index > -1){
             return polygon_intersection(ray,prims[index]);
         }
@@ -86,7 +74,6 @@ struct Geom : public Shape {
 			const R c = cross(E1,intersection - vertex[0]).abs();
 
 			const Vec3 ret_normal = (a * normal[0] + b * normal[1] + c * normal[2]).normalized();
-			//const Vec3 ret_normal = (cross(vertex[1] - vertex[0],vertex[2] - vertex[1])).normalized();
 			if(prim.texture_id >= 0){
 				return new Intersection_point(t,intersection,ret_normal,Material(textures[prim.texture_id].get_kd(u * (uv[1] - uv[0]) + v * (uv[2] - uv[0]) + uv[0])));
 			}
@@ -117,15 +104,6 @@ struct Geom : public Shape {
                 + vertices[prim.vertices_index[2]] * (M - m);
 
         normal = (cross(vertices[prim.vertices_index[1]] - vertices[prim.vertices_index[0]],vertices[prim.vertices_index[2]] - vertices[prim.vertices_index[1]])).normalized();
-
-		/*for(int i = 0;i < 3;i++){
-			if(((cross(vertices[prim.vertices_index[(i + 1) % 3]] - vertices[prim.vertices_index[i]],point - vertices[prim.vertices_index[(i + 1) % 3]])).normalized() * normal < EPS)){
-                std::cerr << "三角形の外" << std::endl;
-                std::cerr << point << std::endl;
-                std::cerr << vertices[prim.vertices_index[0]] << " " << vertices[prim.vertices_index[1]] << " " << vertices[prim.vertices_index[2]] << std::endl;
-                break;
-			}
-        }*/
 
         pdf = 1.0 / (prims_num * prim.S);
         emission = materials[0].Le;

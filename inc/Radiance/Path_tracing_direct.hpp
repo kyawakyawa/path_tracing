@@ -52,7 +52,6 @@ struct Path_tracing_direct : Radiance {
 				const Vec3 path = light_info->point - position;
 				omegal = path.normalized();
 
-				//if(is_shadow(Ray(position,omegal),path.abs(),lights[i]->get_shape())) {
 				if(is_shadow(Ray(position,omegal),light_info->point)) {
 					delete light_info;
 					break;
@@ -90,8 +89,7 @@ struct Path_tracing_direct : Radiance {
 		}
 		
 		const Intersection_point *intersection = intersection_info->intersection_point;
-		//const Shape *intersection_shape = intersection_info->shape;
-		const Material material = intersection->material;//intersection_shape->get_material(intersection->position);
+		const Material material = intersection->material;
 		const Vec3 normal = ((ray.direction * intersection->normal < 0.0) ? 1.0 : -1.0) * intersection->normal;
 		
 		FColor L = (flag && ray.direction * intersection->normal < 0.0) ? material.Le : FColor(0,0,0);
