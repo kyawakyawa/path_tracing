@@ -1,6 +1,6 @@
 # path_tracing
 
-![book](pictures/result000.png)
+![picture](pictures/result000.jpeg)
 
 ## Requirement
 - OS
