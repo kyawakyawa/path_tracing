@@ -1,3 +1,22 @@
 # path_tracing
 
-g++ -std=c++14 -O3 -fopenmp -lglut -lGLU -lGL -lm
+![book](pictures/result000.png)
+
+## Requirement
+- OS
+    - Linux
+- Compiler
+    - clang
+
+## Build
+
+```bash=
+$ make -j
+```
+
+## Run
+
+```bash=
+$ ./exexec.out
+```
+
