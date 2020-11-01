@@ -14,7 +14,7 @@ ALL_CH := $(wildcard src/*/*.c src/*/*cpp inc/*/*.hpp inc/*/*.h)
 
 exec.out: $(ALL_CH)
 	cd obj && $(MAKE) "CXX=$(CXX)" # obj/Makefile を実行する (ALL_Oが作成される)
-	$(CXX) $(CXXFLAGS) $(ALL_O) -lglut -lGLU -lGL -lm -ltbb -ltcmalloc -o $@
+	$(CXX) $(CXXFLAGS) $(ALL_O) -lglut -lGLU -lGL -lm -ltbb -o $@
 test:
 	$(ALL_CH)
 
